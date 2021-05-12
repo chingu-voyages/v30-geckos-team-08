@@ -22,20 +22,5 @@ const PollSchema = new Schema({
     ipAddresses: [String]
 });
 
-// Define static functions to find by IDs
-// NOT TESTED YET - they're new to me
-PollSchema.statics.findByAdminID = function (adminID) {
-    return this.find({ adminID: adminID });
-}
-PollSchema.statics.findByShareID = function (adminID) {
-    return this.find({ shareID: shareID });
-}
-PollSchema.statics.findByResID = function (adminID) {
-    return this.find({ resultsID: resultsID });
-}
-// STILL NEED TO TEST OUT ABOVE functions
-// let found = await Poll.findByAdminID('XYZ'); 
-
-
 // Convert PollSchema into a Model we can work with
 module.exports = mongoose.model('Poll', PollSchema);

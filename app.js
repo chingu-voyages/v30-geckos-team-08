@@ -21,17 +21,13 @@ mongoose.connect(MONGO_URI, {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 
-// Static folder to serve from as per https://expressjs.com/en/starter/static-files.html
-app.use(express.static(__dirname + '/static'));
-// Test by making request to http://localhost:8080/img/kitten.jpg
+// Static folder to serve from https://expressjs.com/en/starter/static-files.html
+app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
 
 app.get('/', function (req, res) {
     res.send("Hello");
 });
 
-const server = app.listen(port, function () {
-    console.log('app.js running on port: ' + port);
-});
 
 process.on('SIGTERM', () => {
     server.close(() => {
@@ -55,6 +51,31 @@ app.get('/test1', function (req, res) {
     ];
     pollCreate(...myPoll);
     res.send("Done");
+});
+    
+// Test of a lookup function
+// This find returns result: 
+//{ _id: 609c0949da91f28837e3b31b, question: "What's your favorite color out of these?" }
+app.get('/test2', function (req, res) {
+    console.log("entered test2")
+    var id = "GLE888";
+    var query = Poll.findOne({ adminID: id });
+    query.select('question'); // limit the fields of what is returned
+    query.exec(function (err, result) {
+        console.log("inside query");
+        if (err) {
+            console.log(err);
+            res.send("err" + err);
+        }
+        else {
+            console.log(result);
+            res.send("result: " + result);
+        }
+    });
+});
+
+const server = app.listen(port, function () {
+    console.log('app.js running on port: ' + port);
 });
 
 function pollCreate(ques, ans, vots, resID, admID, sharID, expirOn, privRes, ipdCheck, cookCheck) {
