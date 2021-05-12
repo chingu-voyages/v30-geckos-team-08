@@ -2,7 +2,7 @@
   "name": "v30-geckos-team-08",
   "version": "1.0.0",
   "description": "Your project's `readme` is as important to success as your code. For  this reason you should but as much care into it's creation and maintenance steps as you would any other component of the application.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/chingu-voyages/v30-geckos-team-08/issues"
   },
-  "homepage": "https://github.com/chingu-voyages/v30-geckos-team-08#readme"
+  "homepage": "https://github.com/chingu-voyages/v30-geckos-team-08#readme",
+  "dependencies": {
+    "async": "^3.2.0",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.8",
+    "nanoid": "^3.1.23"
+  }
 }
