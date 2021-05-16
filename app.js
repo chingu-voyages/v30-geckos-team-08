@@ -24,8 +24,17 @@ db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 // Static folder to serve from https://expressjs.com/en/starter/static-files.html
 app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
 
+// https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
+//  We can use res.render to load up an ejs view file
+app.set("views", __dirname + "/views");
+app.set('view engine', "ejs");
+// serves ./views/pages/index.ejs, passes aVariable to page
 app.get('/', function (req, res) {
-    res.send("Hello");
+    res.render('pages/index',
+        {
+            aVariable: "hello",
+            pageTitle: "PollCall - Create a poll & share with friends!"
+        });
 });
 
 
