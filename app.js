@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const nanoid = require('nanoid');
+const { nanoid } = require('nanoid'); // Generaotes unique pollIDs
 
 // Allow access to variables in .env file
 require("dotenv").config();
@@ -29,14 +29,6 @@ app.use(express.static(__dirname + '/static')); // Tested by http://localhost:80
 app.set("views", __dirname + "/views");
 app.set('view engine', "ejs");
 // serves ./views/pages/index.ejs, passes aVariable to page
-app.get('/', function (req, res) {
-    res.render('pages/index',
-        {
-            aVariable: "hello",
-            pageTitle: "PollCall - Create a poll & share with friends!"
-        });
-});
-
 
 process.on('SIGTERM', () => {
     server.close(() => {
@@ -45,75 +37,126 @@ process.on('SIGTERM', () => {
     });
 });
 
-app.get('/test1', function (req, res) {
-    const myPoll = [
-        "What's your favorite color out of these?",
-        ["red", "green", "purple"],
-        [0, 0, 0],
-        "XYZ222",
-        "GLE888",
-        "YEL777",
-        null,
-        false,
-        true,
-        false
-    ];
-    pollCreate(...myPoll);
-    res.send("Done");
-});
-    
-// Test of a lookup function
-// This find returns result: 
-//{ _id: 609c0949da91f28837e3b31b, question: "What's your favorite color out of these?" }
-app.get('/test2', function (req, res) {
-    console.log("entered test2")
-    var id = "GLE888";
-    var query = Poll.findOne({ adminID: id });
-    query.select('question'); // limit the fields of what is returned
-    query.exec(function (err, result) {
-        console.log("inside query");
-        if (err) {
-            console.log(err);
-            res.send("err" + err);
-        }
-        else {
-            console.log(result);
-            res.send("result: " + result);
-        }
-    });
-});
-
 const server = app.listen(port, function () {
     console.log('app.js running on port: ' + port);
 });
 
-function pollCreate(ques, ans, vots, resID, admID, sharID, expirOn, privRes, ipdCheck, cookCheck) {
-    pollDetail = {
-        question: ques,
-        answers: ans,
-        votes: vots,
-        resultsID: resID,
-        adminID: admID,
-        shareID: sharID,
-        expiresOn: expirOn,
-        privateResults: privRes,
-        ipDupCheck: ipdCheck,
-        cookieCheck: cookCheck
-    };
+// Home page and poll creation
+app.get('/', function (req, res) {
+    res.render('pages/index',
+        {
+            aVariable: "hello",
+            pageTitle: "PollCall - Create a poll & share it with friends!"
+        });
+});
 
-    let apoll = new Poll(pollDetail);
+// POST to / will create a poll
+app.post('/', function (req, res) {
+    
+    // Create poll in database
+    // If successful display share poll link and link to results, etc
+    // See ./test1 for example of poll creation
 
-    apoll.save(function (err) {
+})
+
+app.get('/about.html', function (req, res) {
+    res.render('pages/about',
+        {
+            aVariable: 'About page',
+            pageTitle: "Poll Call - About"
+        });
+});
+
+// Route to take a poll
+// Example: http://localhost:8080/poll/Xh-lEJ
+app.get('/poll/:id', function (req, res) {
+    // Lookup the poll
+    const paramPollID = req.params.id;
+    var query = Poll.findOne({ pollID: paramPollID });
+    query.exec(function (err, result) {
         if (err) {
-            console.log("DB ERROR: " + err);
-            return;
+            console.log("Error looking up poll: " + err);
+            res.send("Error during poll lookup: " + err);
         }
         else {
-            console.log("Poll written to DB successfully.");
+            console.log("Successful lookup: " + result);
+            
+            const thePoll = new Poll(result);
+            // Check IP/Cookie options from result, do accordingly
+            // forward to results with res.redirect &  a "Already voted message" 
+            // Otherwise, display the poll for voting
+
+            res.render("pages/poll", {
+                pageTitle: "PollCall - Poll: " + thePoll.question,
+                question: thePoll.question,
+                answers: thePoll.answers,
+                pollID: thePoll.pollID,
+            })
         }
     });
-}
+});
 
+// The results page
+// Example: http://localhost:8080/results/Xh-lEJ
+app.get('/results/:id', function (req, res) {
+    // Lookup the poll
+    const paramPollID = req.params.id;
+    var query = Poll.findOne({ pollID: paramPollID });
+    query.exec(function (err, result) {
+        if (err) {
+            console.log("Error looking up poll results: " + err);
+            res.send("Error during poll results lookup: " + err);
+        }
+        else {
+            console.log("Successful lookup of results: " + result);
+            
+            const thePoll = new Poll(result);
+
+            res.render("pages/results", {
+                pageTitle: "PollCall - Results: " + thePoll.question,
+                question: thePoll.question,
+                answers: thePoll.answers,
+                pollID: thePoll.pollID,
+                votes: thePoll.votes,
+            })
+        }
+    });
+});
+
+// An example of poll creation
+app.get('/test1', function (req, res) {
+
+    /* For votes array to pass in, use 
+    let votes = new Array(answers.length);
+    votes.fill(0);
+    */
+    
+    const aPollID = getPollID();
+
+    const apoll = new Poll({
+        question: "Which color out of these is the best?",
+        answers: ["Red", "Green", "Blue"], votes: [0, 0, 0],
+        pollID: aPollID, ipDupCheck: false,
+        cookieCheck: false, ipAdresses: []
+    });
+    apoll.save(function (err, poll) {
+        if (err) {
+            console.err("Error saving poll: " + err);
+            res.send("Error saving poll: " + err);
+        }
+        res.json({ message: "Poll created", data: poll });
+    });
+});
+
+// Returns a unique (unused) string of 6 characters long to use as a pollID
+function getPollID(){
+    let candidate = nanoid(6);
+    var query = Poll.findOne({ pollID: candidate });
+    if (query === null)
+        return getPollID;
+    else
+        return candidate;
+}
 
 
 
