@@ -86,6 +86,8 @@ app.get('/poll/:id', function (req, res) {
             // Check IP/Cookie options from result, do accordingly
             // forward to results with res.redirect &  a "Already voted message" 
             // Otherwise, display the poll for voting
+            // http://expressjs.com/en/resources/middleware/cookie-parser.html
+            // https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
 
             res.render("pages/poll", {
                 pageTitle: "PollCall - Poll: " + thePoll.question,
@@ -151,8 +153,7 @@ app.get('/test1', function (req, res) {
     })();
 });
 
-
-// An example of poll creation
+// An example of poll creation using getPollID2
 app.get('/test3', function (req, res) {
 
     /* For votes array during actual poll creation, use 
@@ -175,43 +176,81 @@ app.get('/test3', function (req, res) {
             }
             res.json({ message: "Poll created", data: poll });
         });
-    })    
-     
+    })         
 });
 
-// Returns a unique (unused) string of 6 characters long to use as a pollID
-// IF COLLISION appends timestamp and then the 6 characters
-function getPollID(){
-    //let candidate = nanoid(6);
-    let candidate = "XXXXXX";
 
-    //var query = Poll.findOne({ pollID: candidate });
-    //query.exec(function (err, result) {
-    
-    Poll.findOne({ pollID: candidate }, function (err, result) {
-        if (err) {
-            console.err("Error in findOne during getPollID");
-            return getPollID();
-        }
-        else {
-            if (result === null) {
-                console.log("getPollID:186 - returning: " + candidate);
-                return candidate;
+app.get('/test4', function (req, res) {
+    function getPoll(pollID){
+	    return Poll.findOne({ pollID: pollID })
+		    .then(function(poll){
+			    return poll;		
+		    })
+		    .catch(function(err){
+			    console.log(err)
+            });
+        
+    } // end function getPoll
+
+    getPoll('XXXXXa')
+	    .then(function(poll){
+		    console.log(poll);
+		    res.send(poll);
+	    });
+
+}); // cool - outputs the found poll json or null
+
+
+/************************** NEXT THREE IS TEST5 ************/
+// Test four above checks for existing poll with a given pollID
+// Test five (this) attempts to build on that to generate a new pollID
+
+function getPollExt(pollID){
+    return Poll.findOne({ pollID: pollID })
+        .then(function (poll) {
+            console.log("getPollExt:207 either null or a poll. Returning: " + poll);
+            return poll;		
+        })
+        .catch(function(err){
+            console.log(err)
+        });
+} // end function getPoll
+
+async function getPollIDExt() {
+    const candidate = nanoid(6);
+    var myRes = undefined;
+    getPollExt(candidate)
+        .then(function (foundPoll) {
+            console.log("foundPoll: " + foundPoll);
+            if (foundPoll) {
+                console.log("getPollIDExt:219 Found, so returning getPollIDExt()");
+                myRes = getPollIDExt();
+                return getPollIDExt();
             }
-            else {
-                // THIS IS A TERRIBLE HACK - ON FINDING ONE ALREADY USED, APPEND TIMESTAMP TO IT
-                console.log("Collision found - appending timestamp");
-                let res = Date.now().toString() + "-" + candidate;
-                return res;
-                
+            else if(foundPoll === null){
+                console.log("getPollIDExt:227 Not found so returning candidate: " + candidate);
+                myRes = candidate;
+                return candidate; // WORKS & PRINTS CORRECTLY
             }
-        }
-    }); 
+
+        })
+    console.log('getPollIDExt:235 myRes is: ' + myRes);
+    return myRes;
 }
+app.get('/test5', function (req, res) {
+    let result = undefined;
+    (async () => {
+        const result = await getPollIDExt();
+        console.log("test5 route:231 result is: " + result); // 
+        res.send("Result: " + result);
+    })();
+})
+
+/************ END TEST5 **********/
 
 function getPollID2(){
-    //let candidate = nanoid(6);
-    let candidate = "XXXXXX";
+    let candidate = nanoid(6);
+    // let candidate = "XXXXXX"; // used for testing of duplicate catching
 
     return new Promise((resolve, reject) => {
         Poll.findOne({ pollID: candidate }, function (err, result) {
@@ -224,10 +263,10 @@ function getPollID2(){
                     console.log("getPollID2 result was null so no dupes found, resolving: " + candidate);
                     resolve(candidate);
                 }
-                else {
-                    console.log("getPollID2 dupe found, appending timestamp");
+                else { // THIS IS A TERRIBLE HACK BECAUSE I COULDN'T RECURSIVELY CALL TO GENERATE A NEW NANOID
+                    console.log("getPollID2 dupe found, appending timestamp"); 
                     const newCandidate = Date.now().toString() + "-" + candidate;
-                    resolve(newCandidate);
+                    resolve(newCandidate); // example: 1621443230717-XXXXXX
                 }
             }
         });
