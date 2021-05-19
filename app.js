@@ -41,8 +41,10 @@ const server = app.listen(port, function () {
     console.log('app.js running on port: ' + port);
 });
 
+
 // Home page and poll creation
 app.get('/', function (req, res) {
+    // index should have the "poll form"
     res.render('pages/index',
         {
             aVariable: "hello",
@@ -50,13 +52,12 @@ app.get('/', function (req, res) {
         });
 });
 
-// POST to / will create a poll
+// POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
     
     // Create poll in database
     // If successful display share poll link and link to results, etc
     // See ./test1 for example of poll creation
-
 })
 
 app.get('/about.html', function (req, res) {
@@ -126,38 +127,110 @@ app.get('/results/:id', function (req, res) {
 // An example of poll creation
 app.get('/test1', function (req, res) {
 
-    /* For votes array to pass in, use 
+    /* For votes array during actual poll creation, use 
     let votes = new Array(answers.length);
     votes.fill(0);
     */
-    
-    const aPollID = getPollID();
+    (async function getID() {
+        const aPollID = getPollID2();
+        console.log("aPollID: " + aPollID);
 
-    const apoll = new Poll({
-        question: "Which color out of these is the best?",
-        answers: ["Red", "Green", "Blue"], votes: [0, 0, 0],
-        pollID: aPollID, ipDupCheck: false,
-        cookieCheck: false, ipAdresses: []
-    });
-    apoll.save(function (err, poll) {
-        if (err) {
-            console.err("Error saving poll: " + err);
-            res.send("Error saving poll: " + err);
-        }
-        res.json({ message: "Poll created", data: poll });
-    });
+        const apoll = new Poll({
+            question: "Which color out of these is the best?",
+            answers: ["Red", "Green", "Blue"], votes: [0, 0, 0],
+            pollID: 'XXXXXX', ipDupCheck: false,
+            cookieCheck: false, ipAdresses: []
+        });
+        apoll.save(function (err, poll) {
+            if (err) {
+                console.err("Error saving poll: " + err);
+                res.send("Error saving poll: " + err);
+            }
+            res.json({ message: "Poll created", data: poll });
+        });
+    })();
+});
+
+
+// An example of poll creation
+app.get('/test3', function (req, res) {
+
+    /* For votes array during actual poll creation, use 
+    let votes = new Array(answers.length);
+    votes.fill(0);
+    */
+    const aPollID = getPollID2();
+    aPollID.then(value => {
+        console.log("aPollID returned: " + value);
+        const apoll = new Poll({
+            question: "Which color out of these is the best?",
+            answers: ["Red", "Green", "Blue"], votes: [0, 0, 0],
+            pollID: value, ipDupCheck: false,
+            cookieCheck: false, ipAdresses: []
+        });
+        apoll.save(function (err, poll) {
+            if (err) {
+                console.err("Error saving poll: " + err);
+                res.send("Error saving poll: " + err);
+            }
+            res.json({ message: "Poll created", data: poll });
+        });
+    })    
+     
 });
 
 // Returns a unique (unused) string of 6 characters long to use as a pollID
+// IF COLLISION appends timestamp and then the 6 characters
 function getPollID(){
-    let candidate = nanoid(6);
-    var query = Poll.findOne({ pollID: candidate });
-    if (query === null)
-        return getPollID;
-    else
-        return candidate;
+    //let candidate = nanoid(6);
+    let candidate = "XXXXXX";
+
+    //var query = Poll.findOne({ pollID: candidate });
+    //query.exec(function (err, result) {
+    
+    Poll.findOne({ pollID: candidate }, function (err, result) {
+        if (err) {
+            console.err("Error in findOne during getPollID");
+            return getPollID();
+        }
+        else {
+            if (result === null) {
+                console.log("getPollID:186 - returning: " + candidate);
+                return candidate;
+            }
+            else {
+                // THIS IS A TERRIBLE HACK - ON FINDING ONE ALREADY USED, APPEND TIMESTAMP TO IT
+                console.log("Collision found - appending timestamp");
+                let res = Date.now().toString() + "-" + candidate;
+                return res;
+                
+            }
+        }
+    }); 
 }
 
+function getPollID2(){
+    //let candidate = nanoid(6);
+    let candidate = "XXXXXX";
 
-
+    return new Promise((resolve, reject) => {
+        Poll.findOne({ pollID: candidate }, function (err, result) {
+            if (err) {
+                console.err("Error in findOne during getPollID2(): " + err);
+                reject(err);
+            }
+            else {
+                if (result === null) {
+                    console.log("getPollID2 result was null so no dupes found, resolving: " + candidate);
+                    resolve(candidate);
+                }
+                else {
+                    console.log("getPollID2 dupe found, appending timestamp");
+                    const newCandidate = Date.now().toString() + "-" + candidate;
+                    resolve(newCandidate);
+                }
+            }
+        });
+    });
+}
 
