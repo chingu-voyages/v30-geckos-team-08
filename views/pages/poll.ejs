@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+    <%- include('../partials/navbar'); %>
+</header>
+
+<main>
+    <div class="jumbotron">
+        <h1>This is great</h1>
+        <p>Welcome to templating using EJS</p>
+        <p>Here's the question: <%= question %></p>
+        <p>And the answers: <%= answers %></p>
+        <p>And the pollID: <%= pollID %></p>
+    </div>
+</main>
+
+<footer>
+    <%- include('../partials/footer'); %>
+    <script>
+        console.log("poll.ejs accessed")
+    </script>
+</footer>
+
+</body>
+</html>
