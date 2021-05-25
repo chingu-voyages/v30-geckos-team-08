@@ -1,0 +1,165 @@
+form {
+    margin: 50px auto;
+    padding: 30px;
+    border: 4px double black;
+    box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.2);
+    /* width: 400px; */
+}
+
+form h2 {
+    margin: 0 0 16px 0;
+    padding: 0;
+}
+
+/* NOTE: In development, it might be good to disable the javascript that toggles the blinking 
+cursor. Otherwise browser dev tools act weird and flash at you.
+See setInterval near top of poll-create-form.js */
+/* Blinking cursor effect - toggle caret-color on .textInput */
+.clearCursor {
+    caret-color: transparent;
+}
+.blackCursor {
+    caret-color: black;
+}
+
+/* Hide the outline/border of active text input fields - rule 1 */
+input {
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: groove;
+    background-color: #eee;
+}
+
+/* Hide the outline/border of active text input fields - rule 2 */
+/* .no-outline:focus{
+    outline: none;
+} */
+form input[type=text] {
+    outline: none;
+}
+
+.error {
+    /* left: 8px; */
+    color: rgb(197, 5, 5);
+    z-index: 2;
+}
+
+form input,
+form label {
+    position: relative;
+    display: inline-block;
+    /* width: 100%; */
+}
+
+.discardSpan {
+    position: absolute;
+    top: 0px;
+    right: 3%;
+    z-index: 15;
+    /* to be on top of the text input field */
+}
+
+.discardTxt {
+    color: #F57F17;
+    font-size: 0.75em;
+}
+
+.discardLink:hover {
+    text-decoration: underline;
+    border-bottom: 1px solid #F57F17;
+    cursor: pointer;
+}
+
+form input[type=text],
+form input[type=password] {
+    font-size: 1.25em;
+    padding: 0 0 5px 0;
+    z-index: 10;
+    background: transparent;
+    margin-bottom: 0.5em;
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+#answers {
+    margin-top: 20px;
+}
+
+form label {
+    display: inline-block;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    padding: 0 0 5px 0;
+    transition: all 0.5s ease-in-out;
+    z-index: 1;
+    top: 36px;
+}
+
+form input[type=submit] {
+    cursor: pointer;
+    margin: 1.33em auto;
+    width: 100%;
+    padding: 10px 0;
+    border: 1px solid black;
+}
+
+.filled label {
+    top: 0;
+    font-size: 0.8em;
+}
+
+.hidden {
+    display: none;
+}
+
+#qField {
+    color: black;
+    /* margin-bottom: 25px; */
+    background-color: rgba(233, 152, 129, 0.97);
+}
+
+.myPollForm {
+    background-color: #C38D9E;
+    padding: 20px, 10px, 20px, 10px;
+}
+
+
+.textInput {
+    background-color: rgba(226, 124, 96, 1);
+    padding: 15px, 20px, 15px, 20px;
+    width: 93%;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.ansDiv {
+    background-color: hsl(172, 47%, 78%);
+    margin-bottom: 15px;
+    position: relative;
+}
+.staticPosition{
+    position: static;
+}
+.help-pill{
+    text-decoration: none;
+}
+.help-pill:hover{ 
+    color: #B2EBF2;
+}
+#toolbar {
+    margin-top: 15px;
+    padding: 10px;
+}
+
+#addAnswerBtn,
+#finishBtn {
+    background-color: #41B3A3;
+}
+
+.error {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    text-decoration: underline dotted red;
+    font-style: italic;
+}

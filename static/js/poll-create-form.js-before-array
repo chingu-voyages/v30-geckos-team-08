@@ -1,0 +1,220 @@
+// On any form input, move the label above it when there it is clicked
+// or when blured if there's input after blur
+$("form input").on("blur input focus", function () {
+	var $field = $(this).closest(".field");
+	if (this.value) {
+		$field.addClass("filled");
+	} else {
+		$field.removeClass("filled");
+	}
+});
+
+// This is needed to move label above the field on initial click
+$("form input").on("focus", function() {
+	var $field = $(this).closest(".field");
+	if (this) {
+		$field.addClass("filled");
+	} else {
+		$field.removeClass("filled");
+	}
+});
+
+let numAnswers = 2;
+$('#numAnswers').val(numAnswers);
+
+$(document).ready(function () {
+
+    // For blinking cursor effect 
+    /* NOTE: In development, it might be good to disable the javascript that toggles the blinking 
+    cursor. Otherwise browser dev tools act weird and flash at you. */
+    /*setInterval(function () {
+        $('.textInput').addClass('clearCursor');
+        $('.textInput').removeClass('blackCursor');
+        setTimeout(function () {
+            $('.textInput').removeClass('clearCursor');
+            $('.textInput').addClass('blackCursor');
+        }, 500);
+    }, 1000);
+    */
+    // Defines the validation function for jquery-validation 
+    $('#pollForm').validate({
+        validClass: 'success',
+        errorPlacement: function (error, element) {
+            error.insertBefore(element);
+        },
+        rules: {
+            question: 'required',
+            answer1: 'required',
+            answer2: 'required'
+        },
+        messages: {
+            question: "You must provide a poll question here!",
+            answer1: "You must provide a poll answer here!",
+            answer2: "You must provide a poll answer here!"
+        }
+    }); // end validate
+
+    // When the button for "Add answer" is clicked
+    $('#addAnswerBtn').click(function (e) {
+        e.preventDefault();
+        
+        // Make sure form is valid (filled) before adding another answer
+        if ($('#pollForm').valid()) {
+            numAnswers = numAnswers + 1;
+            $('#numAnswers').val(numAnswers);
+
+            currName = "answer" + numAnswers;
+
+            let theDiv = document.createElement('div');
+            let divName = currName + "Div";
+            theDiv.setAttribute('id', divName);
+            theDiv.setAttribute('class', "hidden field ansDiv"); // hidden because we animate slideDown below
+
+            let label = document.createElement('label');
+            label.setAttribute('for', currName);
+            label.setAttribute('class', 'ml-4 mr-3');
+            label.innerText = "Enter the next possible answer here.";
+
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.setAttribute('name', currName);
+            input.setAttribute('id', currName);
+            input.setAttribute('data-msg-required', "You must provide a poll answer here!");
+            input.setAttribute('class', currName + ' textInput ml-4 mr-3');
+            input.setAttribute('required', 'required');
+            
+            theDiv.appendChild(label);
+
+            // Setup the discard link
+            (function setupDiscardBtn() {
+                let discardBtn = document.createElement('span');
+                discardBtn.classList.add('discardSpan');
+                let dLink = document.createElement('a');
+                dLink.classList.add('discardLink');
+                let txtSpan = document.createElement('span');
+                txtSpan.classList.add('discardTxt');
+                txtSpan.innerText = "Discard";
+                dLink.appendChild(txtSpan);
+                discardBtn.appendChild(dLink);
+                theDiv.appendChild(discardBtn);
+                
+                // When the discard link is clicked
+                dLink.onclick = function removeAnswer() {
+                    $('#' + divName).remove();
+                    numAnswers = numAnswers - 1;
+                    $('#numAnswers').val(numAnswers);
+
+                }
+            })();
+            
+            theDiv.appendChild(input);
+            document.getElementById('moreAnswers').appendChild(theDiv);
+            
+
+            /************ MORE ANSWERS ON KEYDOWN 13   */
+            // Jquery doesn't set event handlers for dynamically created 
+            // elements unless explictly done upon creation - the others were set at document.ready
+            $('#moreAnswers').on('keydown', '.' + currName, function (e) {
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    //$('#pollForm').valid(); // Just validate - ok to move to next input
+                   
+                    var index = $('.textInput').index(this);
+                    if (index == $('.textInput').length - 1) {
+                        $('#addAnswerBtn').focus();
+                    }
+                    else {
+                        $('.textInput').eq(index + 1).focus();
+                    }
+                    
+                    
+                }
+            })
+
+            // Much the same as below .on - maybe below one is not needed?
+            $('#moreAnswers').on('blur input focus', '.' + currName, function (e) {
+                let value = $('#' + currName).val();
+                let theDiv2 = document.getElementById(divName);
+                if ($('#' + currName).val()) { // if the input field isn't empty
+                    theDiv2.className += " filled";
+                }
+                else {
+                    theDiv2.classList.remove('filled');
+                }
+            });
+
+            // Whichever "moreAnswer" was clicked on, add the class "filled" so its label moves out of 
+            // its input field to above it
+            $('#moreAnswers').on('focus', '.' + currName, function (e) {
+                let theDiv3 = document.getElementById(divName);
+                theDiv3.classList.add('filled');
+            });
+
+            // Show the new answer
+            if ($(theDiv).is(':hidden')) {
+                $(theDiv).slideDown('slow');
+                $(input).focus();
+            }
+        }
+        else { // validation failed
+            $(".textInput.error").eq(0).focus();
+            
+        }
+    }); // end click handler of addAnswerBtn
+
+
+    $('#finishBtn').click(function (e) {
+        e.preventDefault();
+        let myAnswers = [];
+        for (let n = 1; n <= numAnswers; n++) {
+            myAnswers.push($('#answer' + n).val());
+        }
+        const mydata = {
+            "question": $('#question').val(),
+            "answers": myAnswers,
+            "cookieCheck": $('#cookieCheck').val(),
+            "ipCheck": $('#ipCheck').val()
+        };
+        //console.log(data);
+        $.post('/', mydata, function(data,status){
+            console.log('poll-create-form.js:175 send. Data: ' + data + " status: " + status);
+        });
+    });
+    
+
+    /* For any .textInput, move to next input (text or "add answer" button) when return is pressed */
+        $('.textInput').keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+
+                var index = $('.textInput').index(this);
+                
+                // If it's the question, it's the only input 
+                // if it's the last textInput, focus on "Add answer" button
+                if (index == $('.textInput').length - 1) {
+                    $('#addAnswerBtn').focus();
+                }
+                else {
+                    $('.textInput').eq(index + 1).focus();
+                }
+            }
+        })
+}); // end document.ready
+
+        // If user entered a question & pressed RETURN, show the answers section
+        $('#question').keydown(function(e){
+            if (e.keyCode == 13 && $('#question').val().length > 0) {
+                e.preventDefault();
+                if($('#answers').is(':hidden')){
+                    $('#answers').slideDown('slow');
+                }
+            }
+        })
+
+        $('#question').focusout(function(e){
+            if($('#question').val().length > 0){
+                if($('#answers').is(':hidden')){
+                    $('#answers').slideDown('slow');
+                }
+            }
+        });

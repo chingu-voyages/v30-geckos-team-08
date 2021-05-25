@@ -24,6 +24,15 @@ db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 // Static folder to serve from https://expressjs.com/en/starter/static-files.html
 app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
 
+//app.use(express.json());
+
+// using body parser to parse the body of incoming post requests
+app.use(
+  require("body-parser").urlencoded({
+    extended: true, // must give a value for extended
+  })
+);
+
 // https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
 //  We can use res.render to load up an ejs view file
 app.set("views", __dirname + "/views");
@@ -54,11 +63,57 @@ app.get('/', function (req, res) {
 
 // POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
-    
-    // Create poll in database
-    // If successful display share poll link and link to results, etc
-    // See ./test1 for example of poll creation
-})
+    console.log(req.body);
+    const { question, answers, ipCheck, cookieCheck } = req.body;
+    const votes = new Array(answers.length);
+    votes.fill(0);
+    (async function postPoll() {
+        const newPollId = await genPollId();
+        const newPoll = new Poll({
+            question: question,
+            answers: answers,
+            votes: votes,
+            pollID: newPollId,
+            ipDupCheck: ipCheck,
+            cookieCheck: cookieCheck,
+            ipAddresses: []
+        });
+        try {
+            let resultPoll = await newPoll.save();
+            console.log("Poll created successfully.");
+            console.log(resultPoll);
+            const url = '/pollCreated/' + newPollId;
+            //res.redirect(url); this sends the actual html of url page
+            res.status(200).send({ result: 'redirect', url: url })
+        }
+        catch (err) {
+            console.log("Error on creating poll: " + err);
+            res.status(500).send(err);
+        }
+    })();
+});
+
+app.get("/pollCreated/:pollId", function (req, res) {
+    const pollID = req.params.pollId;
+    // Construct the query
+    var query = Poll.findOne({ pollID: pollID });
+    // Run the query
+    query.exec(function (err, result) {
+        if (err) {
+            const errString = "Error looking up poll of with id of " + pollID + ": " + err;
+            console.log(errString);
+            res.send(errString);
+        }
+        else {
+            console.log("Successful lookup with result: " + result);
+            res.render('pages/pollCreated', {
+                pageTitle: "Poll Created - " + result.question,
+                poll: result,
+                pollId: result.pollID
+            });
+        }
+    });
+});
 
 app.get('/about.html', function (req, res) {
     res.render('pages/about',
@@ -126,150 +181,11 @@ app.get('/results/:id', function (req, res) {
     });
 });
 
-// An example of poll creation
-app.get('/test1', function (req, res) {
-
-    /* For votes array during actual poll creation, use 
-    let votes = new Array(answers.length);
-    votes.fill(0);
-    */
-    (async function getID() {
-        const aPollID = getPollID2();
-        console.log("aPollID: " + aPollID);
-
-        const apoll = new Poll({
-            question: "Which color out of these is the best?",
-            answers: ["Red", "Green", "Blue"], votes: [0, 0, 0],
-            pollID: 'XXXXXX', ipDupCheck: false,
-            cookieCheck: false, ipAdresses: []
-        });
-        apoll.save(function (err, poll) {
-            if (err) {
-                console.err("Error saving poll: " + err);
-                res.send("Error saving poll: " + err);
-            }
-            res.json({ message: "Poll created", data: poll });
-        });
-    })();
-});
-
-// An example of poll creation using getPollID2
-app.get('/test3', function (req, res) {
-
-    /* For votes array during actual poll creation, use 
-    let votes = new Array(answers.length);
-    votes.fill(0);
-    */
-    const aPollID = getPollID2();
-    aPollID.then(value => {
-        console.log("aPollID returned: " + value);
-        const apoll = new Poll({
-            question: "Which color out of these is the best?",
-            answers: ["Red", "Green", "Blue"], votes: [0, 0, 0],
-            pollID: value, ipDupCheck: false,
-            cookieCheck: false, ipAdresses: []
-        });
-        apoll.save(function (err, poll) {
-            if (err) {
-                console.err("Error saving poll: " + err);
-                res.send("Error saving poll: " + err);
-            }
-            res.json({ message: "Poll created", data: poll });
-        });
-    })         
-});
-
-
-app.get('/test4', function (req, res) {
-    function getPoll(pollID){
-	    return Poll.findOne({ pollID: pollID })
-		    .then(function(poll){
-			    return poll;		
-		    })
-		    .catch(function(err){
-			    console.log(err)
-            });
-        
-    } // end function getPoll
-
-    getPoll('XXXXXa')
-	    .then(function(poll){
-		    console.log(poll);
-		    res.send(poll);
-	    });
-
-}); // cool - outputs the found poll json or null
-
-
-/************************** NEXT THREE IS TEST5 ************/
-// Test four above checks for existing poll with a given pollID
-// Test five (this) attempts to build on that to generate a new pollID
-
-function getPollExt(pollID){
-    return Poll.findOne({ pollID: pollID })
-        .then(function (poll) {
-            console.log("getPollExt:207 either null or a poll. Returning: " + poll);
-            return poll;		
-        })
-        .catch(function(err){
-            console.log(err)
-        });
-} // end function getPoll
-
-async function getPollIDExt() {
+async function genPollId() {
     const candidate = nanoid(6);
-    var myRes = undefined;
-    getPollExt(candidate)
-        .then(function (foundPoll) {
-            console.log("foundPoll: " + foundPoll);
-            if (foundPoll) {
-                console.log("getPollIDExt:219 Found, so returning getPollIDExt()");
-                myRes = getPollIDExt();
-                return getPollIDExt();
-            }
-            else if(foundPoll === null){
-                console.log("getPollIDExt:227 Not found so returning candidate: " + candidate);
-                myRes = candidate;
-                return candidate; // WORKS & PRINTS CORRECTLY
-            }
-
-        })
-    console.log('getPollIDExt:235 myRes is: ' + myRes);
-    return myRes;
+    const searchResult = await Poll.findOne({ pollID: candidate });
+    if (searchResult) {
+        return genPollId();
+    }
+    else return candidate;
 }
-app.get('/test5', function (req, res) {
-    let result = undefined;
-    (async () => {
-        const result = await getPollIDExt();
-        console.log("test5 route:231 result is: " + result); // 
-        res.send("Result: " + result);
-    })();
-})
-
-/************ END TEST5 **********/
-
-function getPollID2(){
-    let candidate = nanoid(6);
-    // let candidate = "XXXXXX"; // used for testing of duplicate catching
-
-    return new Promise((resolve, reject) => {
-        Poll.findOne({ pollID: candidate }, function (err, result) {
-            if (err) {
-                console.err("Error in findOne during getPollID2(): " + err);
-                reject(err);
-            }
-            else {
-                if (result === null) {
-                    console.log("getPollID2 result was null so no dupes found, resolving: " + candidate);
-                    resolve(candidate);
-                }
-                else { // THIS IS A TERRIBLE HACK BECAUSE I COULDN'T RECURSIVELY CALL TO GENERATE A NEW NANOID
-                    console.log("getPollID2 dupe found, appending timestamp"); 
-                    const newCandidate = Date.now().toString() + "-" + candidate;
-                    resolve(newCandidate); // example: 1621443230717-XXXXXX
-                }
-            }
-        });
-    });
-}
-

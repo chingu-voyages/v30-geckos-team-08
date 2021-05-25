@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+    <link rel="stylesheet" type="text/css" href="/css/pollCreated.css">
+
+</head>
+<body class="container">
+
+<header>
+    <%- include('../partials/navbar'); %>
+    
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script> -->
+</header>
+
+<main>
+    <div class="jumbotron">
+        <h1 class="text-center display-2 p-5">PollCall</h1>
+        <p class="text-center display-6 mt-sm-1">Your poll was created!</p>
+        <p>
+            pollId: <%= pollId %> 
+        </p>
+        <p>
+            poll: <%= poll %>
+        </p>
+    </div>
+    
+    
+</main>
+
+<footer>
+    <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>
