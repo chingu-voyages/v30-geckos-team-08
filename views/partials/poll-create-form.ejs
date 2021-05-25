@@ -2,23 +2,23 @@
         <div class="myPollForm rounded">
             <form autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
                 <div class="field" id="qField">
-                    <label id="qLabel" class="ml-4 mr-3" for="question">Enter the question you would like your poll to ask here.</label>
+                    <label id="qLabel" class="ml-4 mr-3" for="question">Enter poll question</label>
                     <input type="text" class="textInput ml-4 mr-3" name="question" id="question" required>
                 </div>
                 <div id="answers" class="hidden">
                     <div class="field ansDiv">
-                        <label id="a1Label" class="ml-4 mr-3" for="answer1">Enter the first possible answer to the question here...</label>
+                        <label id="a1Label" class="ml-4 mr-3" for="answer1">Enter first choice</label>
                         <input type="text" class="textInput ml-4 mr-3" id="answer1" required name="answer1">
                     </div> 
                     <div class="field ansDiv">
-                        <label id="a2Label" class="ml-4 mr-3" for="answer2">Enter the second possible answer here...</label>
+                        <label id="a2Label" class="ml-4 mr-3" for="answer2">Enter second choice</label>
                         <input type="text" class="textInput ml-4 mr-3" id="answer2" required name="answer2">
                     </div>
                     <div id="moreAnswers"></div>
 
                     
                     <div id="toolbar" class="mt-4 d-flex justify-content-around">
-                        <button id="addAnswerBtn" class="btn-primary rounded">Add another possible answer</button>
+                        <button id="addAnswerBtn" class="btn-primary rounded">Add choice</button>
                         <div id="dupOptions">
                             <div class="mb-1 mt-1">
                                 Prevent voting more than once?
@@ -40,7 +40,7 @@
                                 </label>
                             </div>
                         </div>
-                        <button id="finishBtn" class="btn-primary rounded">Finish creating poll</button>
+                        <button id="finishBtn" class="btn-primary rounded">Create poll</button>
                     </div>
                 </div> <!-- end div#answers-->
             </form>

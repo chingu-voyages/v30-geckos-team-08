@@ -1,9 +1,10 @@
 form {
     margin: 50px auto;
     padding: 30px;
-    border: 4px double black;
-    box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.2);
+    /* border: 4px double black; */
+    /* box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.2); */
     /* width: 400px; */
+    border-radius: 50%;
 }
 
 form h2 {
@@ -61,8 +62,9 @@ form label {
 }
 
 .discardTxt {
-    color: #F57F17;
-    font-size: 0.75em;
+    /* color: #F57F17; */
+    color: blue;
+    font-size: 0.9em;
 }
 
 .discardLink:hover {
@@ -116,7 +118,7 @@ form input[type=submit] {
 #qField {
     color: black;
     /* margin-bottom: 25px; */
-    background-color: rgba(233, 152, 129, 0.97);
+    background-color: rgba(235, 167, 148, 0.97);
 }
 
 .myPollForm {
@@ -154,7 +156,9 @@ form input[type=submit] {
 
 #addAnswerBtn,
 #finishBtn {
-    background-color: #41B3A3;
+    background-color: #63bd7e;
+    width: 10rem;
+    height: 4rem;
 }
 
 .error {
