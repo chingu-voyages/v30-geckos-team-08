@@ -156,6 +156,7 @@ $(document).ready(function () {
 
     // Event handler for when Finish button is clicked
     $('#finishBtn').click(function (e) {
+        console.log("hello")
         e.preventDefault();
         let myAnswers = []; // Collect all answers in myAnswers array
         for (let n = 1; n <= numAnswers; n++) {
