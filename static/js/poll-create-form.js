@@ -49,9 +49,9 @@ $(document).ready(function () {
             answer2: 'required'
         },
         messages: {
-            question: "You must provide a poll question here!",
-            answer1: "You must provide a poll answer here!",
-            answer2: "You must provide a poll answer here!"
+            question: "Please enter a question before moving on",
+            answer1: "Please enter a choice before moving on",
+            answer2: "Please enter a choice before moving on"
         }
     }); // end validate
 
@@ -72,13 +72,13 @@ $(document).ready(function () {
             let label = document.createElement('label');
             label.setAttribute('for', currName);
             label.setAttribute('class', 'ml-4 mr-3');
-            label.innerText = "Enter the next possible answer here.";
+            label.innerText = "Enter additional choice";
 
             var input = document.createElement('input');
             input.type = 'text';
             input.setAttribute('name', currName); /* changed change changed changed */
             input.setAttribute('id', currName);
-            input.setAttribute('data-msg-required', "You must provide a poll answer here!");
+            input.setAttribute('data-msg-required', "Please enter a choice before moving on");
             input.setAttribute('class', currName + ' textInput ml-4 mr-3');
             input.setAttribute('required', 'required');
             
