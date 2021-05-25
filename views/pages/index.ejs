@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
     <%- include('../partials/head'); %>
+    <link rel="stylesheet" type="text/css" href="./css/poll-create-form.css">
+
 </head>
 <body class="container">
 
 <header>
     <%- include('../partials/navbar'); %>
+    <!-- Pretty sure this jquery was needed as what bootstrap bundle didn't have everything -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
 </header>
 
 <main>
@@ -15,10 +20,13 @@
         <p class="text-center display-6 mt-sm-1">Easily create and share polls!</p>
         <!-- <p class="text-center">Here's a variable passed from res.render: <%= aVariable %></p> -->
     </div>
+    <%- include('../partials/poll-create-form'); %>
+
 </main>
 
 <footer>
     <%- include('../partials/footer'); %>
+    <script src="./js/poll-create-form.js"></script>
     <script>
         console.log("index.ejs accessed")
     </script>

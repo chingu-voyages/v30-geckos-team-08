@@ -1,0 +1,68 @@
+ <div class="container">
+        <div class="myPollForm rounded">
+            <form autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
+                <div class="field" id="qField">
+                    <label id="qLabel" class="ml-4 mr-3" for="question">Enter the question you would like your poll to ask here.</label>
+                    <input type="text" class="textInput ml-4 mr-3" name="question" id="question" required>
+                </div>
+                <div id="answers" class="hidden">
+                    <div class="field ansDiv">
+                        <label id="a1Label" class="ml-4 mr-3" for="answer1">Enter the first possible answer to the question here...</label>
+                        <input type="text" class="textInput ml-4 mr-3" id="answer1" required name="answer1">
+                    </div> 
+                    <div class="field ansDiv">
+                        <label id="a2Label" class="ml-4 mr-3" for="answer2">Enter the second possible answer here...</label>
+                        <input type="text" class="textInput ml-4 mr-3" id="answer2" required name="answer2">
+                    </div>
+                    <div id="moreAnswers"></div>
+
+                    
+                    <div id="toolbar" class="mt-4 d-flex justify-content-around">
+                        <button id="addAnswerBtn" class="btn-primary rounded">Add another possible answer</button>
+                        <div id="dupOptions">
+                            <div class="mb-1 mt-1">
+                                Prevent voting more than once?
+                                <a href="" class="badge rounded-pill bg-secondary help-pill" data-bs-toggle="modal" data-bs-target="#duplicate-check-help">
+                                    ?
+                                </a>
+
+                            </div>
+                            <div class="form-check ml-2">
+                            <input class="form-check-input" type="checkbox" id="cookieCheck" name="cookieCheck" value="doCookieCheck">
+                                <label class="form-check-label staticPosition" for="flexCheckDefault">
+                                    Cookie check
+                                </label>
+                                </div>
+                                <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="ipCheck" name="ipCheck" value="doIpCheck">
+                                <label class="form-check-label staticPosition" for="flexCheckChecked">
+                                    IP Address check
+                                </label>
+                            </div>
+                        </div>
+                        <button id="finishBtn" class="btn-primary rounded">Finish creating poll</button>
+                    </div>
+                </div> <!-- end div#answers-->
+            </form>
+        </div>
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="duplicate-check-help" tabindex="-1" aria-labelledby="dupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dupModalLabel">Duplicate vote prevention options</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To prevent users from voting more than once, you can choose one or both of the following options.</p>
+        <p><b>Cookie check: </b>A cookie will be set in the visitor's browser when they vote and no further votes will be allowed on this poll once the cookie is set. Note: A determined "cheater" can clear his or her browser cookies or use a different browser to vote more than once to defeat this option.</p>
+        <p><b>IP Address check: </b>A visitor's IP address will be recorded and no further votes on this poll will be allowed from that address. Note: Because some environments share a single IP address, e.g. some corporations, schools, & hospitals, this option is not ideal if distributing your survey to multiple recipients in an organization that might be sharing an IP.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
