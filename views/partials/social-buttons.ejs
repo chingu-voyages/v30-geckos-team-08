@@ -22,6 +22,9 @@
     }
     
     let openArgs = `'', 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, top=400, left=400, width=600, height=300', false`;
+    // LinkedIn popup wasn't sizing correctly with 1200x627 image specified in og metadata. I think it needs square dimensions (not 1.9x1)
+    let linkedinArgs = `'', 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, top=400, left=400, width=400, height=400', false`;
+
 
     let fbLink = "https://www.facebook.com/sharer/sharer.php?u=" + shareUrl;
     let fbOnClick = `window.open('${fbLink}', ${openArgs})`;
@@ -47,7 +50,7 @@
     if(locals.shareSummary){ // my testing indicates linkedIn doesn't use title or summary (at least not anymore)
         linkedinLink += `&summary=${shareSummary}`;
     }
-    let linkedinOnClick = `window.open('${linkedinLink}', ${openArgs})`;
+    let linkedinOnClick = `window.open('${linkedinLink}', ${linkedinArgs})`;
 %> 
 <div class="shareHeading text-center mb-2">
     Like PollCall? Share it with your friends!
