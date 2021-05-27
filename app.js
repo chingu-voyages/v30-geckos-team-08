@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { nanoid } = require('nanoid'); // Generaotes unique pollIDs
+const fetch = require('node-fetch');
 
 // Allow access to variables in .env file
 require("dotenv").config();
@@ -179,6 +180,74 @@ app.get('/results/:id', function (req, res) {
             })
         }
     });
+});
+
+app.get('/results/img/:resultsImg', function (req, res) {
+    console.log("results/img/:resultsImg route entered");
+    const oImg = req.params.resultsImg;
+    const rImg = oImg.slice(0, -4);
+    var query = Poll.findOne({ pollID: rImg }); // FIX
+    query.exec(function (err, result) {
+        if (err) {
+            console.log("Error looking up poll results: " + err);
+            //res.send("Error during poll results lookup: " + err);
+        }
+        else {
+            if (result == null) { // lookup didn't find that pollId
+                res.status(404).send("Poll " + rImg + " not found!");
+            }
+            // else
+            const thePoll = new Poll(result);
+            const chartConf = {
+                type: 'pie',                                // Show a bar chart
+                data: {
+                    labels: thePoll.answers,   // Set X-axis labels
+                    datasets: [{
+                        label: 'Answers',                         // Create the 'Users' dataset
+                        data: thePoll.votes           // Add data to the chart
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: Poll.question
+                    }
+                }
+            } // end chartConf
+
+            const chartConfigString = encodeURIComponent(JSON.stringify(chartConf));
+            
+
+            let url = 'https://quickchart.io/chart?c=' + chartConfigString;
+            console.log("url: " + url);
+
+            (async function getChart() {
+                let response = await fetch(url);
+                if (response.ok) { // if HTTP status is 200-299
+                    const imgBlob = await response.blob();
+                    console.log("blob type: " + typeof imgBlob);
+                    console.dir(imgBlob);
+                    //res.send(imgBlob); //ok but shows in browser and no rename
+                    //res.download(imgBlob, rImg + ".png"); No because 1st arg must be file path
+                    /*
+                    res.setHeader('Content-Disposition', 'attachment; filename=' + rImg + ".png");
+                    res.setHeader('Content-Transfer-Encoding', 'binary');
+                    res.setHeader('Content-Type', 'application/octet-stream');
+                    res.sendFile(imgBlob);
+                    */
+                    
+                    res.type(imgBlob.type);
+                    imgBlob.arrayBuffer().then(buf => {
+                        res.send(Buffer.from(buf)) // displays in browser
+                        
+                    })
+                }
+                else {
+                    console.log("HTTP Error: " + response.status);
+                }
+            })();
+        } // end else
+    }); // end query.exec()
 });
 
 async function genPollId() {
