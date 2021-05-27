@@ -39,6 +39,7 @@
     let redditLink = `https://reddit.com/submit?url=${shareUrl}&title=${shareTitle}`;
     let redditOnClick = `window.open('${redditLink}', ${openArgs})`;
 
+    
     let linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`;
     if(locals.shareTitle){
         linkedinLink += `&title=${shareTitle}`;
@@ -48,6 +49,9 @@
     }
     let linkedinOnClick = `window.open('${linkedinLink}', ${openArgs})`;
 %> 
+<div class="shareHeading text-center mb-2">
+    Like PollCall? Share it with your friends!
+</div>
 
 <div class="mx-auto social-buttons">
     <a class="btn p-2 m-2 popup" onclick="<%-fbOnClick%>" id="fb-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Facebook">

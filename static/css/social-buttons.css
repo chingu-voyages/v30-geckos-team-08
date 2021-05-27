@@ -1,6 +1,7 @@
 .social-buttons {
     /* did not include height/width */
     max-width: 600px;
+    margin-bottom: 35px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
