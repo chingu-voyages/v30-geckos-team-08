@@ -210,7 +210,7 @@ app.get('/results/img/:resultsImg', function (req, res) {
                 options: {
                     title: {
                         display: true,
-                        text: Poll.question
+                        text: thePoll.question
                     }
                 }
             } // end chartConf
