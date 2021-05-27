@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:og="https://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
+<html lang="en" xmlns="https://www.w3.org/1999/xhtml" xmlns:og="https://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
 <head>
     <%- include('../partials/head'); %>
     <link rel="stylesheet" type="text/css" href="./css/poll-create-form.css">
@@ -8,12 +8,12 @@
     <meta property="og:type" content="website" /> 
     <!-- Use this for subpages  <meta property="og:type" content="article" /> -->
     <meta property="og:url" content="https://poll-call.herokuapp.com/" />
-    <meta property="og:title" content="PollCall - Create polls & share them with friends!" />
-    <meta property="og:description" content="PollCall lets you create a poll and share it easily - all without logging in." />
+    <meta property="og:title" content="PollCall - Create polls & share them with friends - no registration required!" />
+    <meta property="og:description" content="PollCall lets you easily create polls and share them for voting - all without logging in." />
     <!-- suggested size 1200x627 -->
-    <meta property="og:image" content="https://poll-call.herokuapp.com/img/poll-call-social-img-1200x600.jpg" />
+    <meta property="og:image" content="https://poll-call.herokuapp.com/img/poll-call-social-img-1200x627.jpg" />
     <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="600">
+    <meta property="og:image:height" content="627">
     <meta property="og:image:type" content="image/jpeg" />
     <meta name="og:site_name" content="PollCall">
 </head>
@@ -22,7 +22,6 @@
 <header>
     <%- include('../partials/navbar'); %>    
 </header>
-xmlns="https://www.w3.org/1999/xhtml" xmlns:og="https://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"
 <main>
     <div class="jumbotron">
         <h1 class="text-center display-2 p-5">PollCall</h1>
@@ -35,10 +34,10 @@ xmlns="https://www.w3.org/1999/xhtml" xmlns:og="https://ogp.me/ns#" xmlns:fb="ht
         <%- include('../partials/social-buttons',
         {
             // shareTitle overrides og:title. summary overrides og:description
-            shareTitle: "PollCall - Create polls & share them with friends!",
+            shareTitle: "PollCall - Create polls & share them with friends - no registration required!",
             shareUrl: "https://poll-call.herokuapp.com/",
-            shareTweet: "Create polls quickly & easily - no registration required - at PollCall.",
-            shareSummary: "PollCall lets you create a poll and share it easily - all without logging in.",
+            shareTweet: "Create polls quickly & easily - without having to register or log in - at PollCall!",
+            shareSummary: "PollCall lets you create a poll and share it easily - all without any needing to register or log in.",
             shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun"
         }); 
         %>
