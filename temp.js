@@ -1,3 +1,74 @@
+/*  From poll form - colors 
+
+light grey background of poll form
+background-color: #ebedf0;
+rgb(235, 237, 240)
+
+reddish of question field
+rgba(236, 188, 174, 0.97)
+#ecbcaef7
+
+light aqua of answer inputs
+rgb(189, 235, 228)
+background-color: hsl(172, 53%, 83%);
+
+green of buttons
+rgb(99, 189, 126)
+background-color: #63bd7e;
+*/
+/* SOCIAL SHARING NOTES
+Zenhub issue: 
+Create reusable component for sharing poll link, (and also link for home page?)
+-Url to copy/send and also social media options (Facebook, Twitter, Reddit, LinkedIn)
+
+https://www.lcn.com/blog/complete-guide-social-media-markup/
+http://www.sharelinkgenerator.com/
+
+Need to properly embed OG OpenGraph metatags for respective poll, maybe a picture of a generic pie graph
+
+https://www.reddit.com/submit?url=https://strawpoll.com/dg9kp6ser&title=What%20is%20the%20best%20color%20out%20of%20these%20options?
+
+I found two different ones suggested....
+http://www.twitter.com/share?text=What%20is%20the%20best%20color%20out%20of%20these%20options?&url=https://strawpoll.com/dg9kp6ser
+https://twitter.com/intent/tweet?url=https%3A%2F%2Fpoll-call.herokuapp.com%2Fpoll%2Fxyz&text=PollCall%20Poll%20-%20Poll%20Title%20Here
+https://twitter.com/intent/tweet
+?url=http%3A%2F%2Fcss-tricks.com%2F
+&text=Tips%2C+Tricks%2C+and+Techniques+on+using+Cascading+Style+Sheets.
+&hashtags=css,html
+
+
+https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpoll-call.herokuapp.com%2Fpoll%2Fxyz
+https://www.facebook.com/sharer/sharer.php?u=https://strawpoll.com/dg9kp6ser
+
+http://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fpoll-call.herokuapp.com%2Fpoll%2Fxyz&title=PollCall%20Poll%20-%20Poll%20Title%20Here
+https://www.linkedin.com/shareArticle
+?mini=true
+&url=https%3A%2F%2Fwww.css-tricks.com%2F
+&title=CSS-Tricks
+&summary=Tips%2C+Tricks%2C+and+Techniques+on+using+Cascading+Style+Sheets.
+&source=CSS-Tricks
+linkedin will grab title from og:title and summary from og:description 
+
+HOW to pass variables to partial
+<%-include("partials/profile", {fullName:fullName}) %>
+
+HOW to access ejs variable in client JS
+<% if (gameState) { %>
+     <h2>I have a game state!</h2>
+     <script>
+        var clientGameState = <%= gameState %>            
+     </script>
+<% } %>
+
+
+Because the page is just string when rendered, you have to turn the data in a string, then parse it again in js. In my case my data was a JSON array, so:
+
+<script>
+  var test = '<%- JSON.stringify(sampleJsonData) %>'; // test is now a valid js object
+</script>
+
+*/
+
 
 // An example of poll creation
 app.get('/test1', function (req, res) {
@@ -155,3 +226,38 @@ function getPollID2(){
     });
 }
 
+
+/******************* */
+
+$('table').on('input', function() {
+  var url = encodeURIComponent($('#url').val());
+  var tweet = encodeURIComponent($('#tweet').val());
+  var title = encodeURIComponent($('#title').val());
+  var summary = encodeURIComponent($('#summary').val());
+  
+  var hashtags = $('#hashtags').val();
+  hashtags = hashtags.replace(/\s+/g, '');
+  hashtags = hashtags.replace(/#/g, '');
+  hashtags = encodeURIComponent(hashtags);
+  hashtags = hashtags.replace(/%2C/g, ',');
+  
+  facebook = '<li><a href="https://www.facebook.com/sharer.php?u=' + url + '">Share on Facebook</a></li>';
+  
+  twitter = '<li><a href="https://twitter.com/intent/tweet?url=' + url;
+  if (tweet != "") { twitter += '&text=' + tweet };
+  if (hashtags != "") { twitter += '&hashtags=' + hashtags };
+  twitter += '">Share on Twitter</a></li>';
+
+  linkedin = '<li><a href="https://www.linkedin.com/shareArticle?mini=true&url=' + url + '&title=' + title + '&summary=' + summary + '">Share on LinkedIn</a></li>';
+  linkedin = '<li><a href="https://www.linkedin.com/shareArticle?mini=true&url=' + url;
+  if (title != "") { linkedin += '&title=' + title };
+  if (summary != "") { linkedin += '&summary=' + summary };
+  linkedin += '">Share on LinkedIn</a></li>';
+
+  $('textarea').text(facebook + '\n' + twitter + '\n' + linkedin);
+});
+
+$('button').on('click', function() {
+  document.querySelector("#share-links").select();
+  document.execCommand('copy');
+});

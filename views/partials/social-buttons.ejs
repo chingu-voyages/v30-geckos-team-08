@@ -1,0 +1,67 @@
+<% 
+    // shareTitle, shareUrl, shareSummary, shareTweet, shareHashtags
+    if(locals.shareUrl){
+        shareUrl = encodeURIComponent(shareUrl);}
+    else{
+        let shareUrl = encodeURIComponent("https://poll-call.herokuapp.com/");}
+    if(locals.shareTitle){
+        shareTitle = encodeURIComponent(shareTitle);}
+    if(locals.shareSummary){
+        shareSummary = encodeURIComponent(shareSummary);}
+    if(locals.shareTweet){
+        shareTweet = encodeURIComponent(shareTweet);
+    }
+    if(!locals.hashtags){
+        hashtags = "#poll"
+    }
+    if(hashtags){
+        hashtags = hashtags.replace(/\s+/g, '');
+        hashtags = hashtags.replace(/#/g, '');
+        hashtags = encodeURIComponent(hashtags);
+        hashtags = hashtags.replace(/%2C/g, ',');
+    }
+    
+    let fbLink = "https://www.facebook.com/sharer/sharer.php?u=" + shareUrl;
+    let openArgs = `'', 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, top=400, left=400, width=600, height=300', false`;
+    let fbOnClick = `window.open('${fbLink}', ${openArgs})`;
+
+    // A different example said this url: http://www.twitter.com/share?text=What%20is%20the%20best%20color%20out%20of%20these%20options?&url=https://strawpoll.com/dg9kp6ser
+    let twitterLink = "https://twitter.com/intent/tweet?url=" + shareUrl;
+    if(shareTweet){
+        twitterLink += '&text=' + shareTweet; 
+    }
+    if(hashtags){
+        twitterLink += '&hashtags=' + hashtags;
+    }
+    let twitterOnClick = `window.open('${twitterLink}', ${openArgs})`;
+
+    let redditLink = `https://reddit.com/submit?url=${shareUrl}&title=${shareTitle}`;
+    let redditOnClick = `window.open('${redditLink}', ${openArgs})`;
+
+    let linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`;
+    if(locals.shareTitle){
+        linkedinLink += `&title=${shareTitle}`;
+    }
+    if(locals.shareSummary){
+        linkedinLink += `&summary=${shareSummary}`;
+    }
+    linkedinOnClick = `window.open('${linkedinLink}', ${openArgs})`;
+
+%> 
+fbOnClick: <%= fbOnClick %>
+redditOnClick: <%= redditOnClick %>
+
+<div class="mx-auto social-buttons">
+    <a class="btn p-2 m-2 popup" onclick="<%=fbOnClick%>" id="fb-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Facebook">
+        <img alt="Facebook" class="img-fluid" id="fb-img" src="/img/social-icons/iconmonstr-facebook-1-240-gr.png">
+    </a>
+    <a class="btn p-2 m-2" onclick="<%=twitterOnClick%>" id="twitter-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Twitter">
+        <img alt="Twitter" class="img-fluid" id="twitter-img" src="/img/social-icons/iconmonstr-twitter-1-240-gr.png">
+    </a>
+    <a class="btn p-2 m-2" onclick="<%=redditOnClick%>" id="reddit-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Reddit">
+        <img alt="Reddit" class="img-fluid" id="reddit-img" src="/img/social-icons/iconmonstr-reddit-1-240-gr.png">
+    </a>
+    <a class="btn p-2 m-2" onclick="<%=linkedinOnClick%>" id="linkedin-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on LinkedIn">
+        <img alt="LinkedIn" class="img-fluid" id="linkedin-img" src="/img/social-icons/iconmonstr-linkedin-1-240-gr.png">
+    </a>
+</div>
