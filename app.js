@@ -64,7 +64,6 @@ app.get('/', function (req, res) {
 
 // POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
-    console.log(req.body);
     const { question, answers, ipCheck, cookieCheck } = req.body;
     const votes = new Array(answers.length);
     votes.fill(0);
@@ -81,8 +80,6 @@ app.post('/', function (req, res) {
         });
         try {
             let resultPoll = await newPoll.save();
-            console.log("Poll created successfully.");
-            console.log(resultPoll);
             const url = '/pollCreated/' + newPollId;
             //res.redirect(url); this sends the actual html of url page
             res.status(200).send({ result: 'redirect', url: url })
@@ -106,7 +103,6 @@ app.get("/pollCreated/:pollId", function (req, res) {
             res.send(errString);
         }
         else {
-            console.log("Successful lookup with result: " + result);
             res.render('pages/pollCreated', {
                 pageTitle: "Poll Created - " + result.question,
                 poll: result,
@@ -132,11 +128,9 @@ app.get('/poll/:id', function (req, res) {
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
-            console.log("Error looking up poll: " + err);
             res.send("Error during poll lookup: " + err);
         }
         else {
-            console.log("Successful lookup: " + result);
             
             const thePoll = new Poll(result);
             // Check IP/Cookie options from result, do accordingly
@@ -163,12 +157,9 @@ app.get('/results/:id', function (req, res) {
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
-            console.log("Error looking up poll results: " + err);
             res.send("Error during poll results lookup: " + err);
         }
         else {
-            console.log("Successful lookup of results: " + result);
-            
             const thePoll = new Poll(result);
 
             res.render("pages/results", {
@@ -183,14 +174,12 @@ app.get('/results/:id', function (req, res) {
 });
 
 app.get('/results/img/:resultsImg', function (req, res) {
-    console.log("results/img/:resultsImg route entered");
     const oImg = req.params.resultsImg;
     const rImg = oImg.slice(0, -4);
     var query = Poll.findOne({ pollID: rImg }); // FIX
     query.exec(function (err, result) {
         if (err) {
-            console.log("Error looking up poll results: " + err);
-            //res.send("Error during poll results lookup: " + err);
+            res.send("Error during database lookup of poll with id " + rImg + ":" + err);
         }
         else {
             if (result == null) { // lookup didn't find that pollId
@@ -216,34 +205,20 @@ app.get('/results/img/:resultsImg', function (req, res) {
             } // end chartConf
 
             const chartConfigString = encodeURIComponent(JSON.stringify(chartConf));
-            
-
             let url = 'https://quickchart.io/chart?c=' + chartConfigString;
-            console.log("url: " + url);
 
             (async function getChart() {
                 let response = await fetch(url);
                 if (response.ok) { // if HTTP status is 200-299
-                    const imgBlob = await response.blob();
-                    console.log("blob type: " + typeof imgBlob);
-                    console.dir(imgBlob);
-                    //res.send(imgBlob); //ok but shows in browser and no rename
-                    //res.download(imgBlob, rImg + ".png"); No because 1st arg must be file path
-                    /*
-                    res.setHeader('Content-Disposition', 'attachment; filename=' + rImg + ".png");
-                    res.setHeader('Content-Transfer-Encoding', 'binary');
-                    res.setHeader('Content-Type', 'application/octet-stream');
-                    res.sendFile(imgBlob);
-                    */
-                    
-                    res.type(imgBlob.type);
+                    const imgBlob = await response.blob(); 
+                    res.type(imgBlob.type); // set response type
                     imgBlob.arrayBuffer().then(buf => {
-                        res.send(Buffer.from(buf)) // displays in browser
-                        
+                        res.send(Buffer.from(buf)) // displays in browser                        
                     })
                 }
                 else {
-                    console.log("HTTP Error: " + response.status);
+                    console.log("app.js:227 HTTP Error - QuickChart server responded: " + response.status);
+                    res.send("HTTP Error - QuickChart server responded: " + response.status);
                 }
             })();
         } // end else
