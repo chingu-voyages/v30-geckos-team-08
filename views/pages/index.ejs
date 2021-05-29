@@ -1,19 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="https://www.w3.org/1999/xhtml" xmlns:og="https://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
 <head>
     <%- include('../partials/head'); %>
     <link rel="stylesheet" type="text/css" href="./css/poll-create-form.css">
+    <link rel="stylesheet" type="text/css" href="./css/social-buttons.css">
 
+    <meta property="og:type" content="website" /> 
+    <!-- Use this for subpages  <meta property="og:type" content="article" /> -->
+    <meta property="og:url" content="https://poll-call.herokuapp.com/" />
+    <meta property="og:title" content="PollCall - Create polls & share them with friends - no registration required!" />
+    <meta 
+        property="og:description" 
+        content="PollCall lets you easily create polls and share them for voting - all without logging in. Collect votes & gauge opinions. Come back to check the results of your polls anytime!" 
+    /> 
+    <!-- suggested size 1200x627 -->
+    <meta property="og:image" content="https://poll-call.herokuapp.com/img/poll-call-social-img-1200x627.jpg" />
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="PollCall logo and pie graph with colorful wedges" />
+    <meta property="og:site_name" content="PollCall">
 </head>
 <body class="container">
 
 <header>
-    <%- include('../partials/navbar'); %>
-    <!-- Pretty sure this jquery was needed as what bootstrap bundle didn't have everything -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <%- include('../partials/navbar'); %>    
 </header>
-
 <main>
     <div class="jumbotron">
         <h1 class="text-center display-2 p-5">PollCall</h1>
@@ -22,11 +34,27 @@
     </div>
     <%- include('../partials/poll-create-form'); %>
 
+    <div id="buttonDiv mb-4 d-flex justify-content-center">
+        <%- include('../partials/social-buttons',
+        {
+            // shareTitle overrides og:title. summary overrides og:description
+            shareTitle: "PollCall - Create polls & share them with friends - no registration required!",
+            shareUrl: "https://poll-call.herokuapp.com/",
+            shareTweet: "Create polls quickly & easily - without having to register or log in - at PollCall!",
+            shareSummary: "PollCall lets you create a poll and share it easily - all without any needing to register or log in.",
+            shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun"
+        }); 
+        %>
+        
+    </div>
 </main>
 
 <footer>
     <%- include('../partials/footer'); %>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
     <script src="./js/poll-create-form.js"></script>
+    <script src="./js/social-buttons.js"></script>
     <script>
         console.log("index.ejs accessed")
     </script>
