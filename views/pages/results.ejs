@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
     <%- include('../partials/head'); %>
+    <meta property="og:type" content="article" /> 
+    <!-- Use this for subpages  <meta property="og:type" content="article" /> -->
+    <meta property="og:url" content="https://poll-call.herokuapp.com/results/<%=pollID%>" />
+    <meta property="og:title" content="PollCall Results - <%= question %> " />
+    <meta 
+        property="og:description" 
+        content="PollCall poll results for the question, '<%= question %>' - PollCall lets you easily create polls and share them for voting - all without logging in." 
+    /> 
+    <!-- suggested size 1200x627 -->
+    <meta property="og:image" content="https://poll-call.herokuapp.com/results/img/<%=pollID%>.png" />
+    <!-- 
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
+    -->
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="PollCall poll results pie chart" />
+    <meta property="og:site_name" content="PollCall">
 </head>
 <body class="container">
 
@@ -17,6 +34,10 @@
         <p>And the answers: <%= answers %></p>
         <p>Here's the votes: <%= votes %></p>
         <p>And the pollID: <%= pollID %></p>
+
+        <div class="mt-4 resultChart">
+            <img class="img-fluid" src="/results/img/<%=pollID%>.png">
+        </div>
     </div>
 </main>
 

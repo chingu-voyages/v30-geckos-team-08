@@ -25,7 +25,8 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "mongoose": "^5.12.8",
-    "nanoid": "^3.1.23"
+    "nanoid": "^3.1.23",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
