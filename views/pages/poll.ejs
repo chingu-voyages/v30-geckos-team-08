@@ -16,6 +16,10 @@
         <p>Here's the question: <%= question %></p>
         <p>And the answers: <%= answers %></p>
         <p>And the pollID: <%= pollID %></p>
+
+        <form method="POST" action="/results/<%pollID%>?voted=true">
+            <button class="btn"
+        </form>
     </div>
 </main>
 
