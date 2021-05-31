@@ -1,5 +1,5 @@
- <div class="container">
-        <div class="myPollForm rounded">
+ <div class="container px-0 mw-lg-80 mw-md-90">
+        <div class="myPollForm rounded px-2 my-4 style="margin-bottom: 24px;">
             <form autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
                 <div class="field" id="qField">
                     <label id="qLabel" class="ml-4 mr-3" for="question">Enter poll question</label>
@@ -16,36 +16,52 @@
                     </div>
                     <div id="moreAnswers"></div>
 
-                    
-                    <div id="toolbar" class="mt-4 d-flex justify-content-around">
-                        <button id="addAnswerBtn" class="btn-primary rounded">Add choice</button>
-                        <div id="dupOptions">
-                            <div class="mb-1 mt-1">
-                                Prevent voting more than once?
-                                <a href="" class="badge rounded-pill bg-secondary help-pill" data-bs-toggle="modal" data-bs-target="#duplicate-check-help">
-                                    ?
+                    <div class="container my-3 mx-auto text-center">
+                        <div class="col w-100">
+                            <div class="d-inline-block">
+                                Attempt to prevent users from voting more than once?
+                            </div>
+                            <div class="d-inline-block">
+                                <a href="" id="questMk" data-bs-toggle="modal" data-bs-target="#duplicate-check-help">
+                                    <i class="d-inline-block bi bi-question-circle-fill help-pill" 
+                                        style="font-size: 0.95rem; vertical-align:5px; color: #3459d4;">
+                                    </i>
                                 </a>
+                            </div>
 
-                            </div>
-                            <div class="form-check ml-2">
-                            <input class="form-check-input" type="checkbox" id="cookieCheck" name="cookieCheck" value="doCookieCheck">
-                                <label class="form-check-label staticPosition" for="flexCheckDefault">
-                                    Cookie check
-                                </label>
-                                </div>
-                                <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ipCheck" name="ipCheck" value="doIpCheck">
-                                <label class="form-check-label staticPosition" for="flexCheckChecked">
-                                    IP Address check
-                                </label>
-                            </div>
                         </div>
-                        <button id="finishBtn" type="button" class="btn-primary rounded">Create poll</button>
+                        <div class="dropdown mx-auto d-inline-block">
+                            <!-- If you try to add btn class to below, button text overflows -->
+                            <button class="btn-secondary rounded dropdown-toggle d-inline-block" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <!-- Attempt to prevent users from voting more than once? -->
+                                <span id="dupChoiceSpan">Off</span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="#">IP Address-based prevention</a></li>
+                                <li><a class="dropdown-item" href="#">Browser cookie-based prevention</a></li>
+                                <li><a class="dropdown-item" href="#">Use both strategies</a></li>
+                                <li><a class="dropdown-item" href="">Off</a></i>
+                            </ul>
+                        </div> <!-- end class dropdown -->
+                    </div> <!-- end div.container-->
+
+                    <div id="dupDropdown row mt-4 mb-2"> <!-- A ROW -->
+                        
+                    </div> <!-- end row dupDropdown -->
+                        
+
+                    <div class="row d-flex justify-content-evenly">
+                        <div class="col text-center">
+                            <button id="addAnswerBtn" class="d-inline-block btn-primary rounded">Add another answer</button>
+                        </div>
+                        <div class="col text-center">
+                            <button id="finishBtn" type="button" class="d-inline-block btn-primary rounded">Create poll</button>
+                        </div>
                     </div>
-                </div> <!-- end div#answers-->
+                </div> <!-- end div#answers - the initially hidden bottom part of the form -->
             </form>
-        </div>
-    </div>
+        </div> <!-- end div.myPollForm -->
+    </div> <!-- end container -->
 
 <!-- Modal -->
 <div class="modal fade" id="duplicate-check-help" tabindex="-1" aria-labelledby="dupModalLabel" aria-hidden="true">
@@ -56,9 +72,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>To prevent users from voting more than once, you can choose one or both of the following options.</p>
+        <p>To discourage users from voting more than once, several strategies can be used. No strategy is foolproof.</p>
         <p><b>Cookie check: </b>A cookie will be set in the visitor's browser when they vote and no further votes will be allowed on this poll once the cookie is set. Note: A determined "cheater" can clear his or her browser cookies or use a different browser to vote more than once to defeat this option.</p>
         <p><b>IP Address check: </b>A visitor's IP address will be recorded and no further votes on this poll will be allowed from that address. Note: Because some environments share a single IP address, e.g. some corporations, schools, & hospitals, this option is not ideal if distributing your survey to multiple recipients in an organization that might be sharing an IP.</p>
+        <p><b>Both: </b>Both cookie checks and IP address checks will be performed.</p>
+        <p><b>None: </b>No protective measure will be put in place.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

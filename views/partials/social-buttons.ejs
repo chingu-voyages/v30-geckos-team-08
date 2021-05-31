@@ -53,7 +53,11 @@
     let linkedinOnClick = `window.open('${linkedinLink}', ${linkedinArgs})`;
 %> 
 <div class="shareHeading text-center mb-2">
-    Like PollCall? Share it with your friends!
+<%    if(!locals.shareHeading){
+        shareHeading = "NOT SET - social-buttons.ejs:57";
+    }
+%>
+    <%- shareHeading %>
 </div>
 
 <div class="mx-auto social-buttons">

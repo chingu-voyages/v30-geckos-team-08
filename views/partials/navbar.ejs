@@ -1,21 +1,27 @@
-<nav class="navbar navbar-expand-sm navbar-light">
-  <!-- <a class="navbar-brand" href="/">PollCall</a> -->
-  <div class="container-md gray-300" >
-    <a class="navbar-brand" id="our-navbrand" href="/">
-      <img src="/img/pollcall-logo.png" alt="PollCall logo" width="65" height="53" 
-        class="navbrand-logo d-inline-block">
-      <!-- <strong>PollCall</strong> -->
-      <span class="h2 navbrand-txt">PollCall</span>
-    </a>
-    <div class="wrapper d-inline-block px-md-4 pr-4 pr-md-5">
-  <ul class="navbar-nav">
-    <li class="nav-item px-md-3 d-inline-block">
-      <a class="nav-link pt-1 pt-md-1 pb-0 pb-md-0" href="/">Home</a>
-    </li>
-    <li class="nav-item px-md-3 d-inline-block">
-      <a class="nav-link pb-1 pb-md-0 pt-1 pt-md pr-sm-3" href="/about">About</a>
-    </li>
-  </ul>
-  </div>
-  </div>
+<!-- start navbar -->
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #d9e2ef;">
+    <div class="container-md bg-primary pe-2"> <!-- We can try container-md here maybe -->
+        <div id="my-navbar-brand">
+            <a href="/" class="navbar-brand">
+                <img src="/img/pollcall-logo.png" class="d-inline-block align-middle"
+                    style="position: relative; top: -0.25rem; left: 0.5rem" 
+                    alt="PollCall Logo" width="75" height="63">
+                PollCall
+            
+            </a> <!-- end a.navbar-brand -->
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse"  data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item active">
+                    <a href="/" class="nav-link" aria-current="page">Create Poll</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/about" class="nav-link">About</a>
+                </li>
+            </ul>
+        </div> <!-- end div#navbarNav -->
+    </div>
 </nav>

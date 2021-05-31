@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="https://www.w3.org/1999/xhtml" xmlns:og="https://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
+<html 
+    lang="en" 
+    xmlns="https://www.w3.org/1999/xhtml" 
+    xmlns:og="https://ogp.me/ns#" 
+    xmlns:fb="http://ogp.me/ns/fb#"
+>
 <head>
     <%- include('../partials/head'); %>
     <link rel="stylesheet" type="text/css" href="./css/poll-create-form.css">
-    <link rel="stylesheet" type="text/css" href="./css/social-buttons.css">
-    <link rel="stylesheet" type="text/css" href="./css/styles.css">
-    
+   
     <meta property="og:type" content="website" /> 
     <!-- Use this for subpages  <meta property="og:type" content="article" /> -->
     <meta property="og:url" content="https://poll-call.herokuapp.com/" />
@@ -22,7 +25,7 @@
     <meta property="og:image:alt" content="PollCall logo and pie graph with colorful wedges" />
     <meta property="og:site_name" content="PollCall">
 </head>
-<body>
+<body class="container">
 <header>
     <%- include('../partials/navbar'); %>    
 </header>
@@ -42,7 +45,8 @@
             shareUrl: "https://poll-call.herokuapp.com/",
             shareTweet: "Create polls quickly & easily - without having to register or log in - at PollCall!",
             shareSummary: "PollCall lets you create a poll and share it easily - all without any needing to register or log in.",
-            shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun"
+            shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun",
+            shareHeading: "Like PollCall? Share it with your friends below!"
         }); 
         %>
         
@@ -51,12 +55,14 @@
 
 <footer>
     <%- include('../partials/footer'); %>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    
+    <!-- specifically in index.ejs I used this -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <!-- And here's this pages client JS -->
     <script src="./js/poll-create-form.js"></script>
-    <script src="./js/social-buttons.js"></script>
+    
     <script>
-        console.log("index.ejs accessed")
+        console.log("index.ejs accessed");
     </script>
 </footer>
 
