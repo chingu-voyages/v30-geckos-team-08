@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html 
+    lang="en" 
+    xmlns="https://www.w3.org/1999/xhtml" 
+    xmlns:og="https://ogp.me/ns#" 
+    xmlns:fb="http://ogp.me/ns/fb#"
+>
 <head>
     <%- include('../partials/head'); %>
     <link rel="stylesheet" type="text/css" href="/css/pollCreated.css">
 
 </head>
-<body class="container">
+<body class="container-md px-0">
 
 <header>
     <%- include('../partials/navbar'); %>
-    
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script> -->
 </header>
 
 <main>
@@ -22,7 +24,7 @@
             pollId: <%= pollId %> 
         </p>
         <p>
-            poll: <%= poll %>
+            poll: <%- poll %>
         </p>
     </div>
     

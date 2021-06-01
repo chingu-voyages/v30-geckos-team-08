@@ -1,51 +1,71 @@
- <div class="container">
-        <div class="myPollForm rounded">
-            <form autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
+<!-- <div class="container px-0 mw-lg-80 mw-md-90"> -->
+<div class="container-md px-0">
+        <div class="myPollForm rounded px-2 mx-2 my-4" style="margin-bottom: 24px;">
+            <form autocomplete="off" id="pollForm" class="p-4" action="/" method="POST" enctype="multipart/form-data">
                 <div class="field" id="qField">
-                    <label id="qLabel" class="ml-4 mr-3" for="question">Enter poll question</label>
-                    <input type="text" class="textInput ml-4 mr-3" name="question" id="question" required>
+                    <label id="qLabel" class="" for="question">Enter poll question</label>
+                    <input type="text" class="textInput mb-2" name="question" id="question" required>
                 </div>
                 <div id="answers" class="hidden">
                     <div class="field ansDiv">
-                        <label id="a1Label" class="ml-4 mr-3" for="answer1">Enter first choice</label>
-                        <input type="text" class="textInput ml-4 mr-3" id="answer1" required name="answer1">
+                        <label id="a1Label" class="" for="answer1">Enter first choice</label>
+                        <input type="text" class="textInput mb-2" id="answer1" required name="answer1">
                     </div> 
                     <div class="field ansDiv">
-                        <label id="a2Label" class="ml-4 mr-3" for="answer2">Enter second choice</label>
-                        <input type="text" class="textInput ml-4 mr-3" id="answer2" required name="answer2">
+                        <label id="a2Label" class="" for="answer2">Enter second choice</label>
+                        <input type="text" class="textInput mb-2" id="answer2" required name="answer2">
                     </div>
                     <div id="moreAnswers"></div>
 
-                    
-                    <div id="toolbar" class="mt-4 d-flex justify-content-around">
-                        <button id="addAnswerBtn" class="btn-primary rounded">Add choice</button>
-                        <div id="dupOptions">
-                            <div class="mb-1 mt-1">
-                                Prevent voting more than once?
-                                <a href="" class="badge rounded-pill bg-secondary help-pill" data-bs-toggle="modal" data-bs-target="#duplicate-check-help">
-                                    ?
+                    <div class="container my-4 p-2">
+                        <div class="row">
+                            <div class="col-7 text-start">
+                                <span>
+                                    Attempt to prevent users from voting more than once?
+                                </span>
+                            </div>
+                            <div class="col-2 me-2">
+                                <div class="dropdown d-inline-block">
+                                    <!-- If you try to add btn class to below, button text overflows -->
+                                    <button class="btn-secondary rounded dropdown-toggle d-inline-block" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <!-- Attempt to prevent users from voting more than once? -->
+                                        <span id="dupChoiceSpan">Off</span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        <li id="dpLi2" class="dpLi"><a class="dropdown-item" href="" id="dpLink2">IP Address-based prevention</a></li>
+                                        <li id="dpLi3" class="dpLi" class="dpLi"><a class="dropdown-item" href="" id="dpLink3">Browser cookie-based prevention</a></li>
+                                        <li id="dpLi4" class="dpLi"><a class="dropdown-item" href="" id="dpLink4">Use both strategies</a></li>
+                                        <li id="dpLi1" class="dpLi"><a class="dropdown-item active" aria-current="true" href="" id="#dpLink1">Off</a></i>
+                                    </ul>
+                                </div> <!-- end class dropdown -->
+                            </div> <!-- end 2nd column -->
+                            <div class="col-1">
+                                <a href="" class="ms-1" id="questMk" data-bs-toggle="modal" data-bs-target="#duplicate-check-help">
+                                    <i class="d-inline-block bi bi-info-circle-fill help-pill" 
+                                        style="font-size: 1rem; vertical-align: 5px;">
+                                    </i>
                                 </a>
+                            </div>
+                        </div> <!-- end col w-100 -->
+                    </div> <!-- end div.container-->
 
-                            </div>
-                            <div class="form-check ml-2">
-                            <input class="form-check-input" type="checkbox" id="cookieCheck" name="cookieCheck" value="doCookieCheck">
-                                <label class="form-check-label staticPosition" for="flexCheckDefault">
-                                    Cookie check
-                                </label>
-                                </div>
-                                <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ipCheck" name="ipCheck" value="doIpCheck">
-                                <label class="form-check-label staticPosition" for="flexCheckChecked">
-                                    IP Address check
-                                </label>
-                            </div>
+                    <div id="dupDropdown row mt-4 mb-2"> <!-- A ROW -->
+                        
+                    </div> <!-- end row dupDropdown -->
+                        
+
+                    <div class="row d-flex justify-content-evenly">
+                        <div class="col text-center">
+                            <button id="addAnswerBtn" class="d-inline-block btn-primary rounded">Add another answer</button>
                         </div>
-                        <button id="finishBtn" class="btn-primary rounded">Create poll</button>
+                        <div class="col text-center">
+                            <button id="finishBtn" type="button" class="d-inline-block btn-primary rounded">Create poll</button>
+                        </div>
                     </div>
-                </div> <!-- end div#answers-->
+                </div> <!-- end div#answers - the initially hidden bottom part of the form -->
             </form>
-        </div>
-    </div>
+        </div> <!-- end div.myPollForm -->
+    </div> <!-- end container -->
 
 <!-- Modal -->
 <div class="modal fade" id="duplicate-check-help" tabindex="-1" aria-labelledby="dupModalLabel" aria-hidden="true">
@@ -56,9 +76,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>To prevent users from voting more than once, you can choose one or both of the following options.</p>
+        <p>To discourage users from voting more than once, several strategies can be used. No strategy is foolproof.</p>
         <p><b>Cookie check: </b>A cookie will be set in the visitor's browser when they vote and no further votes will be allowed on this poll once the cookie is set. Note: A determined "cheater" can clear his or her browser cookies or use a different browser to vote more than once to defeat this option.</p>
         <p><b>IP Address check: </b>A visitor's IP address will be recorded and no further votes on this poll will be allowed from that address. Note: Because some environments share a single IP address, e.g. some corporations, schools, & hospitals, this option is not ideal if distributing your survey to multiple recipients in an organization that might be sharing an IP.</p>
+        <p><b>Both: </b>Both cookie checks and IP address checks will be performed.</p>
+        <p><b>None: </b>No protective measure will be put in place.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -66,3 +88,20 @@
     </div>
   </div>
 </div>
+
+
+
+
+<!--
+<div class="container bg-secondary">
+<div class="rounded py-4 myPollForm">
+    <form id="pollForm" autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
+        <div class="field" id="qField">
+            <label for="question" id="qLabel">Enter poll question</label>
+            <input type="text" class="textInput mx-3" name="question" id="question" required>
+        </div>
+
+    </form> 
+</div> 
+</div>
+-->

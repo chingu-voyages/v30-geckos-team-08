@@ -134,7 +134,7 @@ form input[type=submit] {
 .textInput {
     background-color: rgb(236, 183, 168);
      padding: 15px, 20px, 15px, 20px;
-    /* width: 93%; */ 
+    width: 93%; 
     margin-left: 1rem;
     margin-right: 1rem;
 }
@@ -149,7 +149,6 @@ form input[type=submit] {
 }
 .help-pill{
     text-decoration: none;
-    color: #3459d4;
 }
 .help-pill:hover{ 
     color: #B2EBF2;

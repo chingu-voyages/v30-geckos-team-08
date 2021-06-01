@@ -1,0 +1,16 @@
+.gray-300{
+    background-color: #d9e2ef;
+}
+.navbrand-txt{
+    position: relative;
+    top:7px;
+}
+/*
+.navbrand-logo{
+    position: relative;
+    bottom: 2px; 
+}*/
+#our-navbrand{
+    position: relative;
+    left: 16px;
+}

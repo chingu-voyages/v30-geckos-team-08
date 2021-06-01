@@ -1,17 +1,27 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <!-- <a class="navbar-brand" href="/">PollCall</a> -->
-  <div class="container-fluid">
-  <a class="navbar-brand" href="/">
-    <img src="/img/pollcall-logo.png" alt="" width="60" height="60" class="d-inline-block align-text-center">
-    <strong>PollCall</strong>
-  </a>
-</div>
-  <ul class="navbar-nav mr-auto">
-    <li class="nav-item">
-      <a class="nav-link" href="/">Home</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/about">About</a>
-    </li>
-  </ul>
+<!-- start navbar -->
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #d9e2ef;">
+    <div class="container-md pe-2"> <!-- We can try container-md here maybe -->
+        <div id="my-navbar-brand">
+            <a href="/" class="navbar-brand">
+                <img src="/img/pollcall-logo.png" class="d-inline-block align-middle"
+                    style="position: relative; top: -0.25rem; left: 0.5rem" 
+                    alt="PollCall Logo" width="75" height="63">
+                PollCall
+            
+            </a> <!-- end a.navbar-brand -->
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse"  data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item active">
+                    <a href="/" class="nav-link" aria-current="page">Create Poll</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/about" class="nav-link">About</a>
+                </li>
+            </ul>
+        </div> <!-- end div#navbarNav -->
+    </div>
 </nav>
