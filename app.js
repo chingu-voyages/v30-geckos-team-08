@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { nanoid } = require('nanoid'); // Generaotes unique pollIDs
 const fetch = require('node-fetch');
+const bodyParser = require('body-parser');
 
 // Allow access to variables in .env file
 require("dotenv").config();
@@ -22,17 +23,27 @@ mongoose.connect(MONGO_URI, {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 
+app.use(cookieParser());
+
 // Static folder to serve from https://expressjs.com/en/starter/static-files.html
 app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
 
+function getcookie(req) {
+    var cookie = req.headers.cookie;
+    // user=someone; session=QyhYzXhkTZawIb5qSl3KKyPVN (this is my cookie i get)
+    return cookie.split('; ');
+}
 //app.use(express.json());
 
 // using body parser to parse the body of incoming post requests
-app.use(
-  require("body-parser").urlencoded({
+
+
+app.use(bodyParser.urlencoded({
     extended: true, // must give a value for extended
   })
 );
+
+//app.use(express.urlencoded()); //Parse URL-encoded bodies
 
 // https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
 //  We can use res.render to load up an ejs view file
@@ -74,7 +85,7 @@ app.post('/', function (req, res) {
             answers: answers,
             votes: votes,
             pollID: newPollId,
-            ipDupCheck: ipCheck,
+            ipCheck: ipCheck,
             cookieCheck: cookieCheck,
             ipAddresses: []
         });
@@ -103,10 +114,14 @@ app.get("/pollCreated/:pollId", function (req, res) {
             res.send(errString);
         }
         else {
+            console.log("app.js:106 question is: " + result.question);
             res.render('pages/pollCreated', {
                 pageTitle: "Poll Created - " + result.question,
                 poll: result,
-                pollId: result.pollID
+                pollId: result.pollID,
+                question: result.question,
+                answers: result.answers,
+
             });
         }
     });
@@ -144,6 +159,9 @@ app.get('/poll/:id', function (req, res) {
                 question: thePoll.question,
                 answers: thePoll.answers,
                 pollID: thePoll.pollID,
+                ipCheck: thePoll.ipDupCheck,
+                cookieCheck: thePoll.cookieCheck,
+                
             })
         }
     });
@@ -152,8 +170,24 @@ app.get('/poll/:id', function (req, res) {
 // The results page
 // Example: http://localhost:8080/results/Xh-lEJ
 app.get('/results/:id', function (req, res) {
+
+    console.log('req.headers.cookie: ' + req.headers.cookie);
+    //pollIds = JSON.parse(req.cookies.pi)
+    let readback = JSON.parse(req.headers.cookie.pi);
+    console.log("readback: " + readback);
+    
     // Lookup the poll
     const paramPollID = req.params.id;
+    const dupVote = req.query.dupVote; // was user forwarded here from trying to double vote
+    const setck = req.query.setck;
+    
+    // If user fails IP address check in post route, they're redirected here, but cookie still needs set
+    if (req.query.dupVote == true && req.query.setck == 1) {
+        console.log("app.js:175 setting cookie ")
+    }
+
+    //console.log("dupVote: " + dupVote);
+
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
@@ -162,13 +196,110 @@ app.get('/results/:id', function (req, res) {
         else {
             const thePoll = new Poll(result);
 
+            // If user fails IP address check in post route, they're redirected here, but cookie still needs set
+            if (req.query.dupVote == true && req.query.setck == 1 && thePoll.cookieCheck == true) {
+                console.log("app.js:175 setting cookie ");
+                const cookieConfig = { httpOnly: true, expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)) };
+                if (req.cookies && req.cookies.pi) {
+                    console.log("app.js:193");
+                }
+            }// end if
+
             res.render("pages/results", {
                 pageTitle: "PollCall - Results: " + thePoll.question,
                 question: thePoll.question,
                 answers: thePoll.answers,
                 pollID: thePoll.pollID,
                 votes: thePoll.votes,
+                voted: false,
+                voteIndex: -1,
+                dupVote: dupVote,
             })
+        }
+    });
+});
+app.post('/results/:pollId', function (req, res) {
+    console.log("app.js:211 cookies: " + req.cookies);
+
+    const voteIndex = req.body.voteIndex;
+    const paramPollID = req.params.pollId;
+    let dupVote = false;
+
+    var query = Poll.findOne({ pollID: paramPollID });
+    query.exec(function (err, result) {
+        if (err) {
+            res.send("Error during poll results lookup: " + err);
+        }
+        else {
+            const thePoll = new Poll(result);
+
+            if (thePoll.ipCheck == true) {
+                console.log("app.js:209 yes, do an ipcheck");
+                console.log("app.js:210 req.ip: " + req.ip);
+                console.log("app.js:211 thePoll.ipAddresses: " +
+                    thePoll.ipAddresses);
+                
+                // see if it's in list
+                let alreadyVoted = thePoll.ipAddresses.includes(req.ip);
+                if (alreadyVoted) {
+                    console.log('already voted: ' + req.ip);
+                    dupVote = true;
+                    return res.redirect('/results/' + paramPollID + '?dupVote=true&setck=1');
+                }
+                else {
+                    console.log("app.js:222 not ip already voted")
+                    thePoll.ipAddresses.push(req.ip);
+                }
+            }// end if ipCheck is true
+
+            if (thePoll.cookieCheck == true) {
+                const cookieConfig = { httpOnly: true, expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)) };
+
+                let pollIds = [];
+                if (req.cookies && req.cookies.pi){
+                    pollIds = JSON.parse(req.cookies.pi)
+                    console.log("app.js:234 found pollIds in cookie: " + pollIds);
+                }
+
+                    // look thru for pollId
+                if (pollIds.includes(paramPollID)) {
+                    dupVote = true;
+                    console.log("app.js:238 found duplicate id");
+                    return res.redirect('/results/' + paramPollID + '?dupVote=true');
+                }
+                
+                else {
+                    pollIds = [];
+                }
+                pollIds.push(paramPollID);
+                res.cookie('pi', JSON.stringify(pollIds), cookieConfig);
+            
+            }// end if cookieCheck
+            
+
+      // check ip, cookie
+            thePoll.votes[voteIndex] = thePoll.votes[voteIndex] + 1;
+            try {
+                (async function savePoll() {
+                    let resultPoll = await thePoll.save();
+                    res.render("pages/results", {
+                        pageTitle: "PollCall - Results: " + resultPoll.question,
+                        question: resultPoll.question,
+                        answers: resultPoll.answers,
+                        pollID: resultPoll.pollID,
+                        ipCheck: resultPoll.ipCheck,
+                        cookieCheck: resultPoll.cookieCheck,
+                        votes: resultPoll.votes,
+                        voted: true,
+                        voteIndex: voteIndex
+                    }); // end render
+                })(); // end iife
+            } // end try
+            catch (err) {
+                console.log("Error saving poll: " + err);
+                res.status(500).send(err);
+            }
+            
         }
     });
 });

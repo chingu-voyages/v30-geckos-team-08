@@ -1,15 +1,24 @@
 <% 
+function fixedEncodeURIComponent(str) {
+  return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
+    return '%' + c.charCodeAt(0).toString(16);
+  });
+}
+
     // shareTitle, shareUrl, shareSummary, shareTweet, shareHashtags
     if(locals.shareUrl){
         shareUrl = encodeURIComponent(shareUrl);}
     else{
-        let shareUrl = encodeURIComponent("https://poll-call.herokuapp.com/");}
+        let shareUrl = encodeURIComponent("https://poll-call.herokuapp.com/");
+    }
     if(locals.shareTitle){
-        shareTitle = encodeURIComponent(shareTitle);}
+        shareTitle = fixedEncodeURIComponent(shareTitle);
+    }
     if(locals.shareSummary){
-        shareSummary = encodeURIComponent(shareSummary);}
+        shareSummary = fixedEncodeURIComponent(shareSummary);
+    }
     if(locals.shareTweet){
-        shareTweet = encodeURIComponent(shareTweet);
+        shareTweet = fixedEncodeURIComponent(shareTweet);
     }
     if(!locals.shareHashtags){
         shareHashtags = "#poll"
@@ -17,31 +26,31 @@
     if(shareHashtags){
         shareHashtags = shareHashtags.replace(/\s+/g, '');
         shareHashtags = shareHashtags.replace(/#/g, '');
-        shareHashtags = encodeURIComponent(shareHashtags);
+        shareHashtags = fixedEncodeURIComponent(shareHashtags);
         shareHashtags = shareHashtags.replace(/%2C/g, ',');
     }
     
-    let openArgs = `'', 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, top=400, left=400, width=600, height=300', false`;
+    //let openArgs = `'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, top=400, left=400, width=600, height=300'`;
+    let openArgs = `'toobar=no,top=100,left=100,top=100,menubar=no,width=400,height=400'`;
     // LinkedIn popup wasn't sizing correctly with 1200x627 image specified in og metadata. I think it needs square dimensions (not 1.9x1)
-    let linkedinArgs = `'', 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, top=400, left=400, width=400, height=400', false`;
-
-
+    let linkedinArgs = `'', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,top=400,left=400,width=400,height=400'`;
+    
     let fbLink = "https://www.facebook.com/sharer/sharer.php?u=" + shareUrl;
-    let fbOnClick = `window.open('${fbLink}', ${openArgs})`;
-
+    let fbOnClick = `window.open('${fbLink}', 'Facebook Share', ${openArgs})`;
+    
     // A different example had this url: http://www.twitter.com/share?text=What%20is%20the%20best%20color%20out%20of%20these%20options?&url=https://strawpoll.com/dg9kp6ser
     let twitterLink = "https://twitter.com/intent/tweet?url=" + shareUrl;
     if(shareTweet){
         twitterLink += '&text=' + shareTweet; 
+        //twitterLink += '&text=' + "hellotext";
     }
     if(shareHashtags){
         twitterLink += '&hashtags=' + shareHashtags;
     }
-    let twitterOnClick = `window.open('${twitterLink}', ${openArgs})`;
-
+    let twitterOnClick = `window.open('${twitterLink}', 'Twitter Share', ${openArgs} )`;
+    
     let redditLink = `https://reddit.com/submit?url=${shareUrl}&title=${shareTitle}`;
-    let redditOnClick = `window.open('${redditLink}', ${openArgs})`;
-
+    let redditOnClick = `window.open('${redditLink}', 'Reddit Share', ${openArgs})`;
     
     let linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`;
     if(locals.shareTitle){
@@ -50,27 +59,30 @@
     if(locals.shareSummary){ // my testing indicates linkedIn doesn't use title or summary (at least not anymore)
         linkedinLink += `&summary=${shareSummary}`;
     }
-    let linkedinOnClick = `window.open('${linkedinLink}', ${linkedinArgs})`;
+    let linkedinOnClick = `window.open('${linkedinLink}', 'LinkedIn Share', ${openArgs})`;
 %> 
 <div class="shareHeading text-center mb-2">
 <%    if(!locals.shareHeading){
         shareHeading = "NOT SET - social-buttons.ejs:57";
     }
 %>
-    <%- shareHeading %>
+    <h5 class="d-block mt-5 mb-2"><%-shareHeading%></h5>
 </div>
 
 <div class="mx-auto social-buttons">
-    <a class="btn p-2 m-2 popup" onclick="<%-fbOnClick%>" id="fb-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Facebook">
+    
+    <a class="btn socialbtn p-2 m-2 popup" onclick="<%-fbOnClick%>" id="fb-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Facebook">
         <img alt="Facebook" class="img-fluid" id="fb-img" src="/img/social-icons/iconmonstr-facebook-1-240-gr.png">
     </a>
-    <a class="btn p-2 m-2" onclick="<%-twitterOnClick%>" id="twitter-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Twitter">
-        <img alt="Twitter" class="img-fluid" id="twitter-img" src="/img/social-icons/iconmonstr-twitter-1-240-gr.png">
+    <a class="btn socialbtn p-2 m-2" onclick="<%-twitterOnClick%>" id="twitter-btn" 
+        data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Twitter">
+        <img alt="Twitter" class="img-fluid" id="twitter-img" 
+        src="/img/social-icons/iconmonstr-twitter-1-240-gr.png">
     </a>
-    <a class="btn p-2 m-2" onclick="<%-redditOnClick%>" id="reddit-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Reddit">
+    <a class="btn socialbtn p-2 m-2" onclick="<%-redditOnClick%>" id="reddit-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on Reddit">
         <img alt="Reddit" class="img-fluid" id="reddit-img" src="/img/social-icons/iconmonstr-reddit-1-240-gr.png">
     </a>
-    <a class="btn p-2 m-2" onclick="<%-linkedinOnClick%>" id="linkedin-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on LinkedIn">
+    <a class="btn socialbtn p-2 m-2" onclick="<%-linkedinOnClick%>" id="linkedin-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Share on LinkedIn">
         <img alt="LinkedIn" class="img-fluid" id="linkedin-img" src="/img/social-icons/iconmonstr-linkedin-1-240-gr.png">
     </a>
 </div>

@@ -179,6 +179,7 @@ $(document).ready(function () {
 
         let cookieCheck = false;
         let ipCheck = false;
+
         if (dupProtection == 2 || dupProtection == 4) ipCheck = true;
         if (dupProtection == 3 || dupProtection == 4) cookieCheck = true;
 

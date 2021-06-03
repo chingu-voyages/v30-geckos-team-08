@@ -3,7 +3,7 @@ $(document).ready(function () {
     // Initialize the Bootstrap tooltips
     $(function () {
         $('[data-bs-toggle="tooltip"]').tooltip()
-    })
+    });
     $('#fb-img').hover(function () {
         $('#fb-img').attr("src", "/img/social-icons/iconmonstr-facebook-1-240.png");
     });
@@ -24,10 +24,10 @@ $(document).ready(function () {
     });
     $('#linkedin-img').hover(function () {
         $('#linkedin-img').attr("src", "/img/social-icons/iconmonstr-linkedin-1-240.png");
-    })
+    });
     $('#linkedin-img').mouseleave(function () {
         $('#linkedin-img').attr("src", "/img/social-icons/iconmonstr-linkedin-1-240-gr.png");
-    })
+    });
 
 })
 

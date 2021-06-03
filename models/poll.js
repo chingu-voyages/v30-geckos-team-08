@@ -17,7 +17,7 @@ const PollSchema = new Schema({
     createdOn: { type: Date, default: Date.now },
     //expiresOn: Date, // no longer needed unless we add feature later
     //privateResults: Boolean, // no longer needed unless we add feature later
-    ipDupCheck: Boolean,
+    ipCheck: Boolean,
     cookieCheck: Boolean,
     ipAddresses: [String]
 });

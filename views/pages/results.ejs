@@ -13,7 +13,7 @@
     <meta property="og:title" content="PollCall Results - <%= question %> " />
     <meta 
         property="og:description" 
-        content="PollCall poll results for the question, '<%= question %>' - PollCall lets you easily create polls and share them for voting - all without logging in." 
+        content="PollCall Poll Results, '<%= question %>' - PollCall lets you easily create polls and share them for voting - all without logging in." 
     /> 
     <!-- suggested size 1200x627 -->
     <meta property="og:image" content="https://poll-call.herokuapp.com/results/img/<%=pollID%>.png" />
@@ -32,18 +32,46 @@
 </header>
 
 <main>
-    <div class="jumbotron">
-        <h1>This is great</h1>
-        <p>Welcome to the Results Page</p>
-        <p>Here's the question: <%= question %></p>
-        <p>And the answers: <%= answers %></p>
-        <p>Here's the votes: <%= votes %></p>
-        <p>And the pollID: <%= pollID %></p>
-
-        <div class="mt-4 resultChart">
-            <img class="img-fluid" src="/results/img/<%=pollID%>.png">
+    <div class="jumbotron text-center">
+        <% if(! typeof(locals.dupVote) == 'undefined'){ %>
+            <h1 class="heading">You've already voted once!</h1>
+        <%}%>
+       
+        <% if (voted) { %>
+            <h1 class="heading">Thanks for voting!</h1>
+            <h1 class="text-center display-2 heading">Thanks for voting!</h1>
+        <%} else { %>
+            <h1 class="text-center display-2 heading">Poll results</h1>
+        <% } %>
+        <div class="row mb-5">
+            <% 
+            let count = 0;
+            for(let i = 0; i < votes.length; i++){
+                count += votes[i];
+            } 
+            %> 
+            <div class="col">
+                Total votes cast: <%-count%>
+            </div>
         </div>
+    </div> <!-- end jumbotron-->
+    <div class="mt-4 resultChart mb-4">
+        <img class="img-fluid" src="/results/img/<%=pollID%>.png">
     </div>
+
+    <%- 
+
+        include('../partials/social-buttons',
+        {
+            shareTitle: "Poll Results - " + question,
+            shareUrl: "https://poll-call.herokuapp.com/results/" + pollID,
+            shareTweet: "Poll Results - " + question + 
+            " - Create polls quickly & easily at PollCall!",
+            shareSummary: "PollCall lets you create a poll and share it easily - all without registering or logging in.",
+            shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun",
+            shareHeading: "Share these results with your friends below!"
+        }); 
+    %>
 </main>
 
 <footer>

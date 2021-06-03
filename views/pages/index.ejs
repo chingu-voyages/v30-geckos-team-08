@@ -19,8 +19,8 @@
     /> 
     <!-- suggested size of og:image is 1200x627 -->
     <meta property="og:image" content="https://poll-call.herokuapp.com/img/poll-call-social-img-1200x627.jpg" />
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="627">
+    <!-- <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627"> -->
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content="PollCall logo and pie graph with colorful wedges" />
     <meta property="og:site_name" content="PollCall">
@@ -31,7 +31,7 @@
 </header>
 <main>
     <div class="jumbotron">
-        <h1 class="text-center display-2 p-5">PollCall</h1>
+        <h1 class="text-center display-2 heading">PollCall</h1>
         <p class="text-center display-6 mt-sm-1">Easily create and share polls!</p>
         <!-- <p class="text-center">Here's a variable passed from res.render: <%= aVariable %></p> -->
     </div>
@@ -40,11 +40,10 @@
     <div id="buttonDiv mb-4 d-flex justify-content-center">
         <%- include('../partials/social-buttons',
         {
-            // shareTitle overrides og:title. summary overrides og:description
             shareTitle: "PollCall - Create polls & share them with friends - no registration required!",
             shareUrl: "https://poll-call.herokuapp.com/",
             shareTweet: "Create polls quickly & easily - without having to register or log in - at PollCall!",
-            shareSummary: "PollCall lets you create a poll and share it easily - all without any needing to register or log in.",
+            shareSummary: "PollCall lets you create a poll and share it easily - all without registering or logging in.",
             shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun",
             shareHeading: "Like PollCall? Share it with your friends below!"
         }); 

@@ -1,0 +1,86 @@
+ <div class="container px-0 mw-lg-80 mw-md-90">
+        <div class="myPollForm rounded px-2 my-4 style="margin-bottom: 24px;">
+            <form autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
+                <div class="field" id="qField">
+                    <label id="qLabel" class="ml-4 mr-3" for="question">Enter poll question</label>
+                    <input type="text" class="textInput ml-4 mr-3" name="question" id="question" required>
+                </div>
+                <div id="answers" class="hidden">
+                    <div class="field ansDiv">
+                        <label id="a1Label" class="ml-4 mr-3" for="answer1">Enter first choice</label>
+                        <input type="text" class="textInput ml-4 mr-3" id="answer1" required name="answer1">
+                    </div> 
+                    <div class="field ansDiv">
+                        <label id="a2Label" class="ml-4 mr-3" for="answer2">Enter second choice</label>
+                        <input type="text" class="textInput ml-4 mr-3" id="answer2" required name="answer2">
+                    </div>
+                    <div id="moreAnswers"></div>
+
+                    <div class="container my-3 mx-auto text-center">
+                        <div class="col w-100">
+                            <div class="d-inline-block">
+                                Attempt to prevent users from voting more than once?
+                            </div>
+                            <div class="d-inline-block">
+                                <a href="" id="questMk" data-bs-toggle="modal" data-bs-target="#duplicate-check-help">
+                                    <i class="d-inline-block bi bi-question-circle-fill help-pill" 
+                                        style="font-size: 0.95rem; vertical-align:5px; color: #3459d4;">
+                                    </i>
+                                </a>
+                            </div>
+
+                        </div>
+                        <div class="dropdown mx-auto d-inline-block">
+                            <!-- If you try to add btn class to below, button text overflows -->
+                            <button class="btn-secondary rounded dropdown-toggle d-inline-block" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <!-- Attempt to prevent users from voting more than once? -->
+                                <span id="dupChoiceSpan">Off</span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="#">IP Address-based prevention</a></li>
+                                <li><a class="dropdown-item" href="#">Browser cookie-based prevention</a></li>
+                                <li><a class="dropdown-item" href="#">Use both strategies</a></li>
+                                <li><a class="dropdown-item" href="">Off</a></i>
+                            </ul>
+                        </div> <!-- end class dropdown -->
+                    </div> <!-- end div.container-->
+
+                    <div id="dupDropdown row mt-4 mb-2"> <!-- A ROW -->
+                        
+                    </div> <!-- end row dupDropdown -->
+                        
+
+                    <div class="row d-flex justify-content-evenly">
+                        <div class="col text-center">
+                            <button id="addAnswerBtn" class="d-inline-block btn-primary rounded">Add another answer</button>
+                        </div>
+                        <div class="col text-center">
+                            <button id="finishBtn" type="button" class="d-inline-block btn-primary rounded">Create poll</button>
+                        </div>
+                    </div>
+                </div> <!-- end div#answers - the initially hidden bottom part of the form -->
+            </form>
+        </div> <!-- end div.myPollForm -->
+    </div> <!-- end container -->
+
+<!-- Modal -->
+<div class="modal fade" id="duplicate-check-help" tabindex="-1" aria-labelledby="dupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dupModalLabel">Duplicate vote prevention options</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To discourage users from voting more than once, several strategies can be used. No strategy is foolproof.</p>
+        <p><b>Cookie check: </b>A cookie will be set in the visitor's browser when they vote and no further votes will be allowed on this poll once the cookie is set. Note: A determined "cheater" can clear his or her browser cookies or use a different browser to vote more than once to defeat this option.</p>
+        <p><b>IP Address check: </b>A visitor's IP address will be recorded and no further votes on this poll will be allowed from that address. Note: Because some environments share a single IP address, e.g. some corporations, schools, & hospitals, this option is not ideal if distributing your survey to multiple recipients in an organization that might be sharing an IP.</p>
+        <p><b>Both: </b>Both cookie checks and IP address checks will be performed.</p>
+        <p><b>None: </b>No protective measure will be put in place.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

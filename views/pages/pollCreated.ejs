@@ -17,17 +17,47 @@
 </header>
 
 <main>
-    <div class="jumbotron">
-        <h1 class="text-center display-2 p-5">PollCall</h1>
-        <p class="text-center display-6 mt-sm-1">Your poll was created!</p>
-        <p>
-            pollId: <%= pollId %> 
-        </p>
-        <p>
-            poll: <%- poll %>
-        </p>
+    <div class="jumbotron text-center">
+        <h1 class="text-center display-2 heading">Poll created!</h1>
     </div>
+
+    <!-- insert here -->
+        <div class="container" id="createdLinksContainer">
+        <div id="createdlinksDiv" class="rounded p-4 2 m-4"
+            style="margin-bottom: 24px; background-color: rgb(235, 237, 240)">
+        <p>Please save the following links...</p>
+        <p>
+            Share this link to anyone you want to take your poll: <br />
+            <a href="/poll/<%-pollId%>">https://poll-call.herokuapp.com/poll/<%-pollId%></a>
+        </p>
+        <p>
+            Come back anytime and check your results here: <br />
+            <a href="/results/<%-pollId%>">https://poll-call.herokuapp.com/results/<%-pollId%></a>
+        </p>
+        </div>
+        <p>
     
+
+        </p>
+
+
+
+        
+        </div>
+        <div id="buttonDiv mb-4 d-flex justify-content-center">
+        <%- 
+    
+        include('../partials/social-buttons',
+        {
+            shareTweet: "Please vote in this poll - " + question,
+            shareTitle: "PollCall - " + question,
+            shareUrl: "https://poll-call.herokuapp.com/poll/" + pollId,
+            shareSummary: "PollCall lets you create a poll and share it easily - all without registering or logging in.",
+            shareHashtags: "#poll, #survey, #social, #vote, #graphs, #fun",
+            shareHeading: "Share your poll for voting below!"
+        }); 
+        %>
+    </div>
     
 </main>
 
