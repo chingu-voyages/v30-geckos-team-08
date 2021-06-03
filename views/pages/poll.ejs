@@ -7,6 +7,20 @@
 >
 <head>
     <%- include('../partials/head'); %>
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://poll-call.herokuapp.com/poll/<%=pollID%>" />
+    <meta property="og:title" content="PollCall - <%=question%>" />
+    <meta 
+        property="og:description" 
+        content="Make your opinion known! PollCall lets you easily create polls and share them for voting - all without logging in. Collect votes & gauge opinions. Come back to check the results of your polls anytime!" 
+    /> 
+    <!-- suggested size of og:image is 1200x627 -->
+    <meta property="og:image" content="https://poll-call.herokuapp.com/img/poll-call-social-img-1200x627.jpg" />
+    <!-- <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627"> -->
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="PollCall logo and pie graph with colorful wedges" />
+    <meta property="og:site_name" content="PollCall">
 </head>
 <body class="container-md px-0">
 
@@ -18,78 +32,46 @@
     <div class="jumbotron">
         <h1 class="text-center display-2 heading">Cast your vote</h1>
         <p class="text-center display-6 mt-sm-1"><%=question%></p>
-       
     </div>
-<!--
-    <div class="container-md px-0">
-        <div id="takePollDiv" class="rounded px-2 mx-2 my-4 p-3">
-            <div class="row">
-                <div class="col m-2 p-2 d-flex align-items-center">
-                    <button class="btn btn-secondary me-4" type="button">
-                        Button2
-                    </button>
-                    <div class="takePollAnsDiv p-3 w-100 rounded d-inline-block">
-                        <span>Answer here</span>
-                    </div> -->
 
-            <div id="takePollDiv" class="m-5 p-4 rounded">
-            <% 
-            answers.forEach(function(answer, index){ %>
-                
-                    <div class="row">
-                        <div class="col-2">
-                            <button class="btn ansButt btn-secondary d-inline-block mb-4" 
-                            type="button"
-                            data-index="<%-index%>""
-                            >
-                                Choose
-                            </button>
-                        </div>
-                        <div class="col">
-                            <div id="ansDiv<%-index%>" 
-                                data-index="<%-index%>" 
-                                class="takePollAnsDiv w-100 p-2 rounded d-inline-block"
-                            >
+    <div id="takePollDiv" class="m-5 p-4 rounded">
+        <% 
+        answers.forEach(function(answer, index){ %>
+                <div class="row">
+                    <div class="col-2">
+                        <button class="btn ansButt btn-secondary d-inline-block mb-4" 
+                        type="button"
+                        data-index="<%-index%>""
+                        >
+                            Choose
+                        </button>
+                    </div>
+                    <div class="col">
+                        <div id="ansDiv<%-index%>" 
+                            data-index="<%-index%>" 
+                            class="takePollAnsDiv w-100 p-2 rounded d-inline-block"
+                        >
                             <span><%=answer%></span>
                         </div>
-                    </div> <!-- end row -->
-                
+                    </div>
+                </div> <!-- end row -->
 
-            <% }); %>
-            </div> <!-- end takePollDiv -->
+        <% }); %>
+    </div> <!-- end takePollDiv -->
 
-            <div class="text-center">
-                <form action="/results/<%=pollID%>" method="POST">
-                    <input name="voteIndex" type="hidden">
-                    <button type="submit" id="submitButton" class="btn-primary disabled hidden btn voteBtn mt-4">
-                        Submit vote
-                    </button>    
-                </form>
-            </div>
-           
-
-        </div><!-- end takePollDiv-->
+    <div class="text-center">
+        <form action="/results/<%=pollID%>" method="POST">
+            <input name="voteIndex" type="hidden">
+            <button type="submit" id="submitButton" class="btn-primary disabled hidden btn voteBtn mt-4">
+                Submit vote
+            </button>    
+        </form>
     </div>
 </main>
 
 <footer>
     <%- include('../partials/footer'); %>
-     <script>
-                $('.ansButt').click(function(e){
-                    e.preventDefault();
-                    let vote = $(this).data('index');
-                    console.log("index: " + vote);
-                    const ansDivId = "#ansDiv" + vote;
-                    console.log("ansDivId: "  + ansDivId); 
-                    $('.takePollAnsDiv').removeClass('highlightAns');
-                    $(ansDivId).addClass('highlightAns');
-
-                  
-                    $('input[name="voteIndex"]').val(vote);
-                    $('#submitButton').removeClass('disabled hidden').addClass('d-inline-block');
-                });
-            </script>
-
+    <script src="/js/poll.js"></script>
 
     <script>
         console.log("poll.ejs accessed")

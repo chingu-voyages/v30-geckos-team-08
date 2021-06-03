@@ -4,6 +4,9 @@ const cookieParser = require('cookie-parser');
 const { nanoid } = require('nanoid'); // Generaotes unique pollIDs
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+
+const JWTKEY = 'Z9je9kxoW8XKLUyi5h7tP7yhpgk9';
 
 // Allow access to variables in .env file
 require("dotenv").config();
@@ -16,6 +19,7 @@ var app = express();
 const MONGO_URI = process.env.MONGO_URI;
 const Poll = require('./models/poll');
 
+
 // Below per https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
@@ -23,21 +27,45 @@ mongoose.connect(MONGO_URI, {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 
-app.use(cookieParser());
+app.use(cookieParser()); // puts cookies in req.headers.cookie
+
+// Middleware that reads cookie from requests to obtain list of polls user has taken already.
+// Decodes the JWT and saves the list as array in req.userPolls
+app.use(function (req, res, next) {
+    if (!req.headers.cookie) {
+        req.userPolls = [];
+        next();
+    }
+    else {
+        const rawCookies = req.headers.cookie.split(';');
+        //console.log("rawCookies: " + rawCookies);
+
+        const parsedCookies = {};
+        rawCookies.forEach(rc => {
+            const parsedCookie = rc.split('=');
+            //console.log("app.js:44 parsedCookie: " + parsedCookie);
+
+            parsedCookies[parsedCookie[0].trim()] = parsedCookie[1];
+            //console.log('app.js:41 parsedCookies: ' + parsedCookies);
+        });
+        //console.log('app.js:42 parsedCookies: ' + parsedCookies);
+        
+        //console.log('app.js:45 parsedCookies.jwt: ' + parsedCookies.jwt);
+        var decoded = jwt.verify(parsedCookies.jwt, JWTKEY);
+        //console.dir(decoded);
+        //console.log("app.js:55 decoded.polls: " + decoded.polls);
+      
+        req.userPolls = decoded.polls;
+        next();
+    }
+});
 
 // Static folder to serve from https://expressjs.com/en/starter/static-files.html
 app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
 
-function getcookie(req) {
-    var cookie = req.headers.cookie;
-    // user=someone; session=QyhYzXhkTZawIb5qSl3KKyPVN (this is my cookie i get)
-    return cookie.split('; ');
-}
 //app.use(express.json());
 
 // using body parser to parse the body of incoming post requests
-
-
 app.use(bodyParser.urlencoded({
     extended: true, // must give a value for extended
   })
@@ -138,6 +166,8 @@ app.get('/about.html', function (req, res) {
 // Route to take a poll
 // Example: http://localhost:8080/poll/Xh-lEJ
 app.get('/poll/:id', function (req, res) {
+    console.log("app.js:168 getpoll and req.userPolls: " + req.userPolls);
+
     // Lookup the poll
     const paramPollID = req.params.id;
     var query = Poll.findOne({ pollID: paramPollID });
@@ -146,48 +176,27 @@ app.get('/poll/:id', function (req, res) {
             res.send("Error during poll lookup: " + err);
         }
         else {
-            
             const thePoll = new Poll(result);
-            // Check IP/Cookie options from result, do accordingly
-            // forward to results with res.redirect &  a "Already voted message" 
-            // Otherwise, display the poll for voting
-            // http://expressjs.com/en/resources/middleware/cookie-parser.html
-            // https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
-
             res.render("pages/poll", {
                 pageTitle: "PollCall - Poll: " + thePoll.question,
                 question: thePoll.question,
                 answers: thePoll.answers,
                 pollID: thePoll.pollID,
-                ipCheck: thePoll.ipDupCheck,
+                ipCheck: thePoll.ipCheck,
                 cookieCheck: thePoll.cookieCheck,
-                
             })
         }
     });
 });
 
+
 // The results page
 // Example: http://localhost:8080/results/Xh-lEJ
 app.get('/results/:id', function (req, res) {
+    console.log("app.js:192 req.userPolls: " + req.userPolls);
 
-    console.log('req.headers.cookie: ' + req.headers.cookie);
-    //pollIds = JSON.parse(req.cookies.pi)
-    let readback = JSON.parse(req.headers.cookie.pi);
-    console.log("readback: " + readback);
-    
     // Lookup the poll
     const paramPollID = req.params.id;
-    const dupVote = req.query.dupVote; // was user forwarded here from trying to double vote
-    const setck = req.query.setck;
-    
-    // If user fails IP address check in post route, they're redirected here, but cookie still needs set
-    if (req.query.dupVote == true && req.query.setck == 1) {
-        console.log("app.js:175 setting cookie ")
-    }
-
-    //console.log("dupVote: " + dupVote);
-
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
@@ -195,15 +204,6 @@ app.get('/results/:id', function (req, res) {
         }
         else {
             const thePoll = new Poll(result);
-
-            // If user fails IP address check in post route, they're redirected here, but cookie still needs set
-            if (req.query.dupVote == true && req.query.setck == 1 && thePoll.cookieCheck == true) {
-                console.log("app.js:175 setting cookie ");
-                const cookieConfig = { httpOnly: true, expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)) };
-                if (req.cookies && req.cookies.pi) {
-                    console.log("app.js:193");
-                }
-            }// end if
 
             res.render("pages/results", {
                 pageTitle: "PollCall - Results: " + thePoll.question,
@@ -213,16 +213,24 @@ app.get('/results/:id', function (req, res) {
                 votes: thePoll.votes,
                 voted: false,
                 voteIndex: -1,
-                dupVote: dupVote,
+                dupVote: false
             })
         }
     });
 });
-app.post('/results/:pollId', function (req, res) {
-    console.log("app.js:211 cookies: " + req.cookies);
 
-    const voteIndex = req.body.voteIndex;
+app.post('/results/:pollId', function (req, res) {
+
+    console.log('app.js:230 entering post to results & req.userPolls: ' + req.userPolls);
     const paramPollID = req.params.pollId;
+
+    // Easiest to always set 
+    if (!req.userPolls) {
+        console.log("app.js:235 !req.userPolls");
+        req.userPolls = [];
+    }
+    
+    const voteIndex = req.body.voteIndex;
     let dupVote = false;
 
     var query = Poll.findOne({ pollID: paramPollID });
@@ -233,56 +241,39 @@ app.post('/results/:pollId', function (req, res) {
         else {
             const thePoll = new Poll(result);
 
-            if (thePoll.ipCheck == true) {
-                console.log("app.js:209 yes, do an ipcheck");
-                console.log("app.js:210 req.ip: " + req.ip);
-                console.log("app.js:211 thePoll.ipAddresses: " +
-                    thePoll.ipAddresses);
-                
-                // see if it's in list
-                let alreadyVoted = thePoll.ipAddresses.includes(req.ip);
-                if (alreadyVoted) {
-                    console.log('already voted: ' + req.ip);
-                    dupVote = true;
-                    return res.redirect('/results/' + paramPollID + '?dupVote=true&setck=1');
-                }
-                else {
-                    console.log("app.js:222 not ip already voted")
-                    thePoll.ipAddresses.push(req.ip);
-                }
-            }// end if ipCheck is true
-
-            if (thePoll.cookieCheck == true) {
-                const cookieConfig = { httpOnly: true, expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)) };
-
-                let pollIds = [];
-                if (req.cookies && req.cookies.pi){
-                    pollIds = JSON.parse(req.cookies.pi)
-                    console.log("app.js:234 found pollIds in cookie: " + pollIds);
-                }
-
-                    // look thru for pollId
-                if (pollIds.includes(paramPollID)) {
-                    dupVote = true;
-                    console.log("app.js:238 found duplicate id");
-                    return res.redirect('/results/' + paramPollID + '?dupVote=true');
-                }
-                
-                else {
-                    pollIds = [];
-                }
-                pollIds.push(paramPollID);
-                res.cookie('pi', JSON.stringify(pollIds), cookieConfig);
+            // never voted on this poll before so set cookie
+            if (!req.userPolls.includes(paramPollID)) {
+                console.log('app.js:231 pushing to userPolls paramPollID: ' + paramPollID);
+                req.userPolls.push(paramPollID);
+                console.log('req.userPolls is: ' + req.userPolls);
+                var token = jwt.sign({ polls: req.userPolls }, JWTKEY);
+                res.cookie('jwt', token, { expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)) });
+            }
+            //****************** THESE TWO NEED FINISHED  */
+            else if ((req.userPolls.includes(paramPollID) && thePoll.cookieCheck) ||
+                (thePoll.ipAddresses.includes(req.ip) && thePoll.ipCheck == true))
+            {
+                console.log("dupe vote cookie check bounce");
+                return res.render("pages/results", {
+                    pageTitle: "You've already voted once before!",
+                    question: thePoll.question,
+                    answers: thePoll.answers,
+                    pollID: thePoll.pollID,
+                    votes: thePoll.votes,
+                    voted: false,
+                    voteIndex: -1,
+                    dupVote: true
+                })
+            }    
+            if (!thePoll.ipAddresses.includes(req.ip)) {
+                thePoll.ipAddresses.push(req.ip);
+            }
             
-            }// end if cookieCheck
-            
-
-      // check ip, cookie
             thePoll.votes[voteIndex] = thePoll.votes[voteIndex] + 1;
             try {
                 (async function savePoll() {
                     let resultPoll = await thePoll.save();
-                    res.render("pages/results", {
+                    return res.render("pages/results", {
                         pageTitle: "PollCall - Results: " + resultPoll.question,
                         question: resultPoll.question,
                         answers: resultPoll.answers,
@@ -299,7 +290,6 @@ app.post('/results/:pollId', function (req, res) {
                 console.log("Error saving poll: " + err);
                 res.status(500).send(err);
             }
-            
         }
     });
 });

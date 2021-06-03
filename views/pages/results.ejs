@@ -33,7 +33,7 @@
 
 <main>
     <div class="jumbotron text-center">
-        <% if(! typeof(locals.dupVote) == 'undefined'){ %>
+        <% if(locals.dupVote == true){ %>
             <h1 class="heading">You've already voted once!</h1>
         <%}%>
        
