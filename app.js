@@ -5,20 +5,30 @@ const { nanoid } = require('nanoid'); // Generaotes unique pollIDs
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const session = require('express-session');
 
-const JWTKEY = 'Z9je9kxoW8XKLUyi5h7tP7yhpgk9';
+const captcha = require('svg-captcha-express').create({ cookie: 'captcha' });
 
 // Allow access to variables in .env file
 require("dotenv").config();
 
 // Heroku will serve on 443, but locally you can either set in your dotenv or leave as it is to go with 8080
 const port = process.env.PORT || process.argv[2] || 8080;
+
 var app = express();
+app.use(
+    session({
+        secret: 'kjkhiohhuiubguiuibiu',
+        resave: false,
+        saveUninitialized: true
+    })
+);
 
 // DATABASE SETUP
 const MONGO_URI = process.env.MONGO_URI;
-const Poll = require('./models/poll');
+const JWTKEY = process.env.JWTKEY;
 
+const Poll = require('./models/poll');
 
 // Below per https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
 mongoose.connect(MONGO_URI, {
@@ -27,38 +37,8 @@ mongoose.connect(MONGO_URI, {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 
-app.use(cookieParser()); // puts cookies in req.headers.cookie
-
-// Middleware that reads cookie from requests to obtain list of polls user has taken already.
-// Decodes the JWT and saves the list as array in req.userPolls
-app.use(function (req, res, next) {
-    if (!req.headers.cookie) {
-        req.userPolls = [];
-        next();
-    }
-    else {
-        const rawCookies = req.headers.cookie.split(';');
-        //console.log("rawCookies: " + rawCookies);
-
-        const parsedCookies = {};
-        rawCookies.forEach(rc => {
-            const parsedCookie = rc.split('=');
-            //console.log("app.js:44 parsedCookie: " + parsedCookie);
-
-            parsedCookies[parsedCookie[0].trim()] = parsedCookie[1];
-            //console.log('app.js:41 parsedCookies: ' + parsedCookies);
-        });
-        //console.log('app.js:42 parsedCookies: ' + parsedCookies);
-        
-        //console.log('app.js:45 parsedCookies.jwt: ' + parsedCookies.jwt);
-        var decoded = jwt.verify(parsedCookies.jwt, JWTKEY);
-        //console.dir(decoded);
-        //console.log("app.js:55 decoded.polls: " + decoded.polls);
-      
-        req.userPolls = decoded.polls;
-        next();
-    }
-});
+// puts cookies in req.headers.cookie - SUPPOSED to put them in req.cookies
+app.use(cookieParser()); 
 
 // Static folder to serve from https://expressjs.com/en/starter/static-files.html
 app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
@@ -72,6 +52,35 @@ app.use(bodyParser.urlencoded({
 );
 
 //app.use(express.urlencoded()); //Parse URL-encoded bodies
+
+// Middleware that reads cookie from requests to obtain list of polls user has taken already.
+// Decodes the JWT and saves the list as array in req.userPolls
+app.use(function (req, res, next) {
+    if (!req.cookies.jwt) {
+        console.log("app.js:80 no req.cookies.jwt!");
+        req.userPolls = [];
+        next();
+    }
+    else {
+        let decoded = {};
+        try {
+            decoded = jwt.verify(req.cookies.jwt, JWTKEY);
+        }
+        catch (err) {
+            console.log("error app.js:89 - " + err);
+            req.userPolls = [];
+            res.cookie('jwt', "", {
+                expires: new Date(Date.now() - (100 * 24 * 60 * 60 * 1000)), httpOnly: true, sameSite: 'Strict'
+            });
+            next();
+            // May want to set to expire here!
+        }
+        req.userPolls = decoded.polls;
+        console.log("app.js:95 req.userPolls: " + req.userPolls);
+        next();
+    }
+})
+
 
 // https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
 //  We can use res.render to load up an ejs view file
@@ -90,20 +99,26 @@ const server = app.listen(port, function () {
     console.log('app.js running on port: ' + port);
 });
 
+app.get(captchaUrl, captcha.image());
+app.get(captchaMathUrl, captcha.math());
+
 
 // Home page and poll creation
 app.get('/', function (req, res) {
-    // index should have the "poll form"
     res.render('pages/index',
         {
             aVariable: "hello",
-            pageTitle: "PollCall - Create a poll & share it with friends!"
+            pageTitle: "PollCall - Create a poll & share it with friends!",
         });
 });
 
 // POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
-    const { question, answers, ipCheck, cookieCheck } = req.body;
+    const { question, answers, ipCheck, cookieCheck, captcha } = req.body;
+    const validCaptcha = captcha.check(req, captcha);
+    if (!validCaptha) {
+        return res.end('Invalid Captcha!');
+    }
     const votes = new Array(answers.length);
     votes.fill(0);
     (async function postPoll() {
@@ -247,13 +262,13 @@ app.post('/results/:pollId', function (req, res) {
                 req.userPolls.push(paramPollID);
                 console.log('req.userPolls is: ' + req.userPolls);
                 var token = jwt.sign({ polls: req.userPolls }, JWTKEY);
-                res.cookie('jwt', token, { expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)) });
+                res.cookie('jwt', token, { expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)), httpOnly: true, sameSite: 'Strict' });
             }
-            //****************** THESE TWO NEED FINISHED  */
+            // Below is the ip check or cookie check based rejection
             else if ((req.userPolls.includes(paramPollID) && thePoll.cookieCheck) ||
                 (thePoll.ipAddresses.includes(req.ip) && thePoll.ipCheck == true))
             {
-                console.log("dupe vote cookie check bounce");
+                console.log("app.js:255 Duplicate votes protection triggered!");
                 return res.render("pages/results", {
                     pageTitle: "You've already voted once before!",
                     question: thePoll.question,

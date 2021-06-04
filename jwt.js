@@ -14,3 +14,5 @@ let decodedBlank = jwt.verify(token, JWTKEY);
 
 console.log("decodedBlank: " + decodedBlank);
 console.dir(decodedBlank);
+
+//decodedBlank.blankPolls is[];
