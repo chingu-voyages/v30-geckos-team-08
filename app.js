@@ -308,7 +308,7 @@ app.post('/results/:pollId', function (req, res) {
             }
             // Below is the ip check or cookie check based rejection
             else if ((req.userPolls.includes(paramPollID) && thePoll.cookieCheck) ||
-                (thePoll.ipAddresses.includes(req.ip) && thePoll.ipCheck == true))
+                (thePoll.ipAddresses.includes(getClientIp(req)) && thePoll.ipCheck == true))
             {
                 console.log("app.js:255 Duplicate votes protection triggered!");
                 return res.render("pages/results", {
@@ -321,9 +321,10 @@ app.post('/results/:pollId', function (req, res) {
                     voteIndex: -1,
                     dupVote: true
                 })
-            }    
-            if (!thePoll.ipAddresses.includes(req.ip)) {
-                thePoll.ipAddresses.push(req.ip);
+            }
+            const ip = getClientIp(req);
+            if (!thePoll.ipAddresses.includes(ip)) {
+                thePoll.ipAddresses.push(ip);
             }
             
             thePoll.votes[voteIndex] = thePoll.votes[voteIndex] + 1;
@@ -411,3 +412,22 @@ async function genPollId() {
     }
     else return candidate;
 }
+
+function getClientIp(req) {
+  var ipAddress;
+  // Amazon EC2 / Heroku workaround to get real client IP
+  var forwardedIpsStr = req.header('x-forwarded-for'); 
+  if (forwardedIpsStr) {
+    // 'x-forwarded-for' header may return multiple IP addresses in
+    // the format: "client IP, proxy 1 IP, proxy 2 IP" so take the
+    // the first one
+    var forwardedIps = forwardedIpsStr.split(',');
+    ipAddress = forwardedIps[0];
+  }
+  if (!ipAddress) {
+    // Ensure getting client IP address still works in
+    // development environment
+    ipAddress = req.connection.remoteAddress;
+  }
+  return ipAddress;
+};
