@@ -10,6 +10,41 @@ function setInputWidth() { // Form input fields dynamically resize
 
 $(document).ready(function () {
 
+    $('#refreshIcon').hover(function () {
+        console.log("running hover handler");
+        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-hover-100x87.png");
+     });
+    
+    $('#refreshIcon').mouseleave(function () {
+        console.log('running mouseleave');
+        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-100x87.png");
+
+    });
+    $('#refreshCaptchaLink').click(function (e) {
+        e.preventDefault();
+        const id = Math.random();
+        $('#captchaImg').attr('src', '/captcha.jpg?id=' + id);
+    });
+
+    $("form#captchaForm").on('submit', function (e) {
+        e.preventDefault();
+        var data = $('#captcha').val();
+        console.log("poll-create-form.js:16 data: " + data);
+        $.ajax({
+            type: 'post',
+            url: '/checkCaptcha',
+            data: {one: data},
+            dataType: 'text',
+            success: function (result) {
+                console.log("poll-create-form.js:23 success result: " + result);
+
+            },
+            error: function (e) {
+                console.log("poll-create-form.js:26 ERROR: " + e);
+            }
+        });
+    });
+
     setInputWidth(); // The form inputs dynamic resizing
     window.addEventListener('resize', setInputWidth);
 
@@ -182,12 +217,14 @@ $(document).ready(function () {
 
         if (dupProtection == 2 || dupProtection == 4) ipCheck = true;
         if (dupProtection == 3 || dupProtection == 4) cookieCheck = true;
-
+        
+        console.log("poll-create-form.js:186 captcha.val(): " + $('#captcha').val());
         const mydata = {
             "question": $('#question').val(),
             "answers": myAnswers,
             "cookieCheck": cookieCheck,
-            "ipCheck": ipCheck
+            "ipCheck": ipCheck,
+            "captchaInput": $('#captcha').val(),
         };
         
         if ($('#pollForm').valid()) {

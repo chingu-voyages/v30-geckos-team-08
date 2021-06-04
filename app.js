@@ -6,11 +6,22 @@ const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
+const path = require('path');
 
-const captcha = require('svg-captcha-express').create({ cookie: 'captcha' });
+const captcha = require('svg-captcha-express').create({
+    cookie: 'captcha',
+    size: 4,
+    height: 125,
+    width: 220
+});
+//load custom font (optional)
+captcha.loadFont(path.join(__dirname, '/static/Comismsh.ttf'));
 
 // Allow access to variables in .env file
 require("dotenv").config();
+
+const MONGO_URI = process.env.MONGO_URI;
+const JWTKEY = process.env.JWTKEY;
 
 // Heroku will serve on 443, but locally you can either set in your dotenv or leave as it is to go with 8080
 const port = process.env.PORT || process.argv[2] || 8080;
@@ -18,15 +29,11 @@ const port = process.env.PORT || process.argv[2] || 8080;
 var app = express();
 app.use(
     session({
-        secret: 'kjkhiohhuiubguiuibiu',
+        secret: JWTKEY,
         resave: false,
         saveUninitialized: true
     })
 );
-
-// DATABASE SETUP
-const MONGO_URI = process.env.MONGO_URI;
-const JWTKEY = process.env.JWTKEY;
 
 const Poll = require('./models/poll');
 
@@ -99,8 +106,8 @@ const server = app.listen(port, function () {
     console.log('app.js running on port: ' + port);
 });
 
-app.get(captchaUrl, captcha.image());
-app.get(captchaMathUrl, captcha.math());
+app.get('/captcha.jpg', captcha.image());
+//app.get(captchaMathUrl, captcha.math());
 
 
 // Home page and poll creation
@@ -114,11 +121,25 @@ app.get('/', function (req, res) {
 
 // POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
-    const { question, answers, ipCheck, cookieCheck, captcha } = req.body;
-    const validCaptcha = captcha.check(req, captcha);
-    if (!validCaptha) {
-        return res.end('Invalid Captcha!');
+    const { question, answers, ipCheck, cookieCheck } = req.body;
+    /*
+    const validCaptcha = captcha.check(req, captchaInput);
+    if (!validCaptcha) {
+        console.log("Invalid captcha");
+        //return res.end('Invalid Captcha!');
+
+        res.render('pages/index',
+        {
+            answers: answers,
+            question: question,
+            ipCheck: ipCheck,
+            cookieCheck: cookieCheck,
+            failedCaptcha: true,
+        })
     }
+
+    console.log("Valid captcha");
+    */
     const votes = new Array(answers.length);
     votes.fill(0);
     (async function postPoll() {
@@ -143,6 +164,27 @@ app.post('/', function (req, res) {
             res.status(500).send(err);
         }
     })();
+});
+
+app.post('/checkCaptcha', function (req, res) {
+    console.log("app.js:166 req.data: " + req.data);
+    
+    console.log("app.js:165 req.body.data: " + req.body.data);
+    console.log("app.js:169 req.body: " + req.body);
+    console.dir(req.body);
+    const input = req.body.one;
+    console.log("input: " + input);
+
+    const validCaptcha = captcha.check(req, input);
+    if (!validCaptcha) {
+        console.log("Invalid captcha");
+        return res.send(false);
+        //return res.end('Invalid Captcha!');
+    }
+    else {
+        console.log("Valid capture");
+        return res.send(true);
+    }
 });
 
 app.get("/pollCreated/:pollId", function (req, res) {

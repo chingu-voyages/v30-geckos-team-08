@@ -47,6 +47,7 @@
                                 </a>
                             </div>
                         </div> <!-- end col w-100 -->
+                        
                     </div> <!-- end div.container-->
 
                     <div id="dupDropdown row mt-4 mb-2"> <!-- A ROW -->
@@ -64,6 +65,29 @@
                     </div>
                 </div> <!-- end div#answers - the initially hidden bottom part of the form -->
             </form>
+
+            <form method="POST" id="captchaForm">
+                <div class="row text-center">
+                    <div class="col w-100">
+                        <div id="myCaptcha" class="d-inline-block bg-warning bg-light rounded mb-2" style="position: relative">
+                            <div class="row m-2"><div class="col">Please solve the captcha & press enter</div></div>
+                            <img src='/captcha.jpg' id="captchaImg" class="mx-auto d-block" style="z-index: 1"; /> 
+                            <a href="" id="refreshCaptchaLink" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Reload captcha image">
+                                <img id="refreshIcon" 
+                                    src="/img/misc-icons/noun_Refresh_1247719-100x87.png" 
+                                    style="height: 28px; width:26px; position: absolute; bottom: 10px; right: 45px;  z-index: 2"
+                                />
+                            </a>
+                            <div class="col w-100">
+                                <input class="d-block mt-2 mb-2 mx-auto" type="text" name="captcha" id="captcha" size="4" placeholder="" />
+
+                            </div>
+                        </div><!-- end #myCaptcha -->
+                        
+                    </div>
+                </div>
+            </form>
+
         </div> <!-- end div.myPollForm -->
     </div> <!-- end container -->
 
