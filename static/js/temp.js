@@ -14,7 +14,6 @@
         
         console.log("poll-create-form.js:186 captcha.val(): " + $('#captcha').val());
         
-
         const mydata = {
             "question": $('#question').val(),
             "answers": myAnswers,
@@ -39,3 +38,27 @@
             $('.error')[0].focus();
         }
     });
+
+/***************************************  */
+    
+
+app.post('/checkCaptcha', function (req, res) {
+    console.log("app.js:166 req.data: " + req.data);
+    
+    console.log("app.js:165 req.body.data: " + req.body.data);
+    console.log("app.js:169 req.body: " + req.body);
+    console.dir(req.body);
+    const input = req.body.one;
+    console.log("input: " + input);
+
+    const validCaptcha = captcha.check(req, input);
+    if (!validCaptcha) {
+        console.log("Invalid captcha");
+        return res.send(false);
+        //return res.end('Invalid Captcha!');
+    }
+    else {
+        console.log("Valid capture");
+        return res.send(true);
+    }
+});

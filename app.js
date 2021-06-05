@@ -11,8 +11,8 @@ const path = require('path');
 const captcha = require('svg-captcha-express').create({
     cookie: 'captcha',
     size: 4,
-    height: 145,
-    width: 238
+    height: 175,
+    width: 245
 });
 //load custom font (optional)
 captcha.loadFont(path.join(__dirname, '/static/Comismsh.ttf'));
@@ -146,7 +146,11 @@ app.post('/', function (req, res) {
             let resultPoll = await newPoll.save();
             const url = '/pollCreated/' + newPollId;
             //res.redirect(url); this sends the actual html of url page
-            res.status(200).send({ captchaPass: true, result: 'redirect', url: url })
+            res.status(200).send({
+                captchaPass: true,
+                result: 'redirect',
+                url: url
+            })
         }
         catch (err) {
             console.log("Error on creating poll: " + err);

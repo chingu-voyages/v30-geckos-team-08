@@ -139,8 +139,6 @@ form input[type=submit] {
     background-color: #ebedf0;
     /* padding: 20px, 10px, 20px, 10px; */
 }
-
-
 .textInput {
     background-color: rgb(236, 183, 168);
      padding: 15px, 20px, 15px, 20px;
@@ -148,7 +146,6 @@ form input[type=submit] {
     margin-left: 1rem;
     margin-right: 1rem;
 }
-
 .ansDiv {
     background-color: hsl(172, 53%, 83%);
     margin-bottom: 15px;
@@ -164,6 +161,18 @@ form input[type=submit] {
 .help-pill:hover{ 
     color: #B2EBF2;
 }
+#refreshIconImg{
+    height: 22px;
+    width: 22px;
+}
+/* the div around it */
+#refreshIcon{
+    padding: 2px;
+    position: absolute;
+    bottom: 4%;
+    right: 5%;
+    z-index: 2;
+}
 .refreshIconOrig{
     border: 3px solid #3459d4;
     border-radius: 50%;
@@ -171,6 +180,26 @@ form input[type=submit] {
 .refreshIconHover{
     border: 3px solid #0dcaf0;
     border-radius: 50%;
+}
+#myCaptcha{
+    /* position: relative; */
+}
+#captchaPic{
+    width: 245px;
+    height:175px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    position: relative;
+    top: 0;
+    left:0;
+    background-image: url('../img/captchafail.png');
+    background-color: #cccccc;
+}
+#captchaImg{
+    position: relative;
+    top: 0;
+    left: 0;
 }
 #toolbar {
     margin-top: 15px;
@@ -183,7 +212,6 @@ form input[type=submit] {
     width: 10rem;
     height: 4rem;
 }
-
 .error {
     margin-left: 1rem;
     margin-right: 1rem;

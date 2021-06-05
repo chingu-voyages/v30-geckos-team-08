@@ -11,18 +11,19 @@ $(document).ready(function () {
 
     $('#refreshIcon').hover(function () {
         console.log("running hover handler");
-        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-hover-100x87.png")
-            .removeClass('refreshIconOrig').addClass('refreshIconHover');
+        $('#refreshIconImg').attr("src", "/img/misc-icons/noun_Refresh_Hover_100x100.png")
+        $('#refreshIcon').removeClass('refreshIconOrig').addClass('refreshIconHover');
      });
     
     $('#refreshIcon').mouseleave(function () {
         console.log('running mouseleave');
-        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-100x87.png")
-            .removeClass('refreshIconOrig').addClass('refreshIconHover');
+        $('#refreshIconImg').attr("src", "/img/misc-icons/noun_Refresh_100x100.png")
+        $('#refreshIcon').removeClass('refreshIconHover').addClass('refreshIconOrig');
     });
     $('#refreshCaptchaLink').click(function (e) {
         e.preventDefault(); // force a new Captcha to be made/shown
-        $('#captchaImg').attr('src', '/captcha.jpg?id=' + Math.random());
+        $('#captchaImg').attr('src', '/captcha.jpg?id=' + Math.random())
+            .removeClass('hidden');
     });
 
     /* WAS WORKING
@@ -72,43 +73,31 @@ $(document).ready(function () {
                 success: function(result){
                     console.log("poll-create-form.js:73 captchacheck returned");
                     
-                    if (result.captchaPass == false)
+                    if (result.captchaPass == false) {
                         console.log("Captcha failed");
+                        $('#captchaImg').addClass('hidden');
+                    }
                     else {
                         console.log("Captcha passed");
                         console.log("result.url: " + result.url);
+                        window.location.replace(result.url);
                     }
                     // could do the window location replace
                 },
                 error: function (e) {
                     console.log("poll-create-form.js:77 ERROR: " + e);
+                    alert("Sorry! Error creating poll: " + e);
                 }
             })
         }
-        /*
-        var data = $('#captcha').val();
-        
-        console.log("poll-create-form.js:16 data: " + data);
-        $.ajax({
-            type: 'post',
-            url: '/checkCaptcha',
-            data: {one: data},
-            dataType: 'text',
-            success: function (result) {
-                console.log("poll-create-form.js:23 success result: " + result);
-
-            },
-            error: function (e) {
-                console.log("poll-create-form.js:26 ERROR: " + e);
-            }
-        });
-        */
+        else {
+            $('.error')[0].focus(); // validate failed so focus on error
+        }
     }); /* end captchaForm on submit
-
+    */
 
     setInputWidth(); // The form inputs dynamic resizing
     window.addEventListener('resize', setInputWidth);
-
 
     // On form text inputs, css class "filled" moves the label above
     $("form input").on("blur input focus", function () {
@@ -132,7 +121,7 @@ $(document).ready(function () {
         }
     });
 
-    
+    /*
     // Blinking cursor effect - nice UI user feedback 
     /* NOTE: In development, it might be good to disable the javascript that toggles the blinking 
     cursor. Otherwise browser dev tools act weird and flash at you. */
@@ -263,51 +252,6 @@ $(document).ready(function () {
             $(".textInput.error").eq(0).focus();
         }
     }); // end click handler of addAnswerBtn
-
-
-    // Event handler for when Finish button is clicked
-    /* WAS WORKING
-    $('#finishBtn').click(function (e) {
-        e.preventDefault();
-        let myAnswers = []; // Collect all answers in myAnswers array
-        for (let n = 1; n <= numAnswers; n++) {
-            myAnswers.push($('#answer' + n).val());
-        }
-
-        let cookieCheck = false;
-        let ipCheck = false;
-
-        if (dupProtection == 2 || dupProtection == 4) ipCheck = true;
-        if (dupProtection == 3 || dupProtection == 4) cookieCheck = true;
-        
-        console.log("poll-create-form.js:186 captcha.val(): " + $('#captcha').val());
-        
-
-        const mydata = {
-            "question": $('#question').val(),
-            "answers": myAnswers,
-            "cookieCheck": cookieCheck,
-            "ipCheck": ipCheck,
-            "captchaInput": $('#captcha').val(),
-        };
-        console.log("poll-create-form.js:231 submitting: " + mydata);
-
-        if ($('#pollForm').valid()) {
-            console.log('js:193 pollForm valid');
-            $.post('/', mydata, function (data, status) {
-                console.log("status: " + status);
-                // above should return "success" - this can probably be improved with error checking
-                // but used below replace() because this is usually a ajax call not a form post
-                // but form submit wasn't as easy - I'd have to create hidden form inputs maybe and parse answers array
-                window.location.replace(data.url);
-            });
-            //$('#pollForm').submit(); this was the problem way
-        }
-        else {
-            $('.error')[0].focus();
-        }
-    });
-    */
     
     /* For any .textInput, move to next input (text or "add answer" button) when return is pressed */
     $('.textInput').keydown(function (e) {

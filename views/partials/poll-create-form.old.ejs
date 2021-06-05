@@ -1,0 +1,136 @@
+<!-- <div class="container px-0 mw-lg-80 mw-md-90"> -->
+<div class="container-md px-0">
+        <div class="myPollForm rounded px-2 mx-2 my-4" style="margin-bottom: 24px;">
+            <form autocomplete="off" id="pollForm" class="py-4 px-1" action="/" method="POST" enctype="multipart/form-data">
+                <div class="field" id="qField">
+                    <label id="qLabel" class="" for="question">Enter poll question</label>
+                    <input type="text" class="textInput mb-2" name="question" id="question" required>
+                </div>
+                <div id="answers" class="hidden">
+                    <div class="field ansDiv">
+                        <label id="a1Label" class="" for="answer1">Enter first choice</label>
+                        <input type="text" class="textInput mb-2" id="answer1" required name="answer1">
+                    </div> 
+                    <div class="field ansDiv">
+                        <label id="a2Label" class="" for="answer2">Enter second choice</label>
+                        <input type="text" class="textInput mb-2" id="answer2" required name="answer2">
+                    </div>
+                    <div id="moreAnswers"></div>
+                    
+                    <div class="row d-flex justify-content-evenly">
+                        <div class="col text-center">
+                            <button id="addAnswerBtn" 
+                                class="d-inline-block btn-primary rounded mb-sm-4">Add another answer
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="dupDropdown row mt-4 mb-2"> <!-- A ROW -->
+                    </div> <!-- end row dupDropdown -->
+                    
+                    <div class="container my-5 p-1 border rounded bg-light">
+                        <div class="row">
+                            <div class="col-9 ps-3 pe-0 text-start">
+                                <span class="ms-1">
+                                    Double-voting protection options
+                                </span>
+                                <a href="" class="ms-1" id="questMk" data-bs-toggle="modal" 
+                                    data-bs-target="#duplicate-check-help" title="More info">
+                                    <i class="d-inline-block bi bi-info-circle-fill help-pill" 
+                                        style="font-size: 1rem; vertical-align: 5px;">
+                                    </i>
+                                </a>
+                            </div>
+                            <div class="col-2 align-self-center ms-1 me-2 ps-0 pe-2">
+                                <div class="dropdown d-inline-block">
+                                    <!-- If you try to add btn class to below, button text overflows -->
+                                    <button class="btn-secondary rounded dropdown-toggle d-inline-block" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <!-- Attempt to prevent users from voting more than once? -->
+                                        <span id="dupChoiceSpan">Off</span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        <li id="dpLi2" class="dpLi"><a class="dropdown-item" href="" id="dpLink2">IP Address-based prevention</a></li>
+                                        <li id="dpLi3" class="dpLi" class="dpLi"><a class="dropdown-item" href="" id="dpLink3">Browser cookie-based prevention</a></li>
+                                        <li id="dpLi4" class="dpLi"><a class="dropdown-item" href="" id="dpLink4">Use both strategies</a></li>
+                                        <li id="dpLi1" class="dpLi"><a class="dropdown-item active" aria-current="true" href="" id="#dpLink1">Off</a></i>
+                                    </ul>
+                                </div> <!-- end class dropdown -->
+                            </div> <!-- end 2nd column -->
+
+                        </div> <!-- end col w-100 -->
+                        
+                    </div> <!-- end div.container-->
+                        
+                </div> <!-- end div#answers - the initially hidden bottom part of the form -->
+            </form> <!-- end myPollForm -->
+
+            <form method="POST" id="captchaForm" class="">
+                <div class="row text-center">
+                    <div class="col w-100">
+                        <div id="myCaptcha" class="d-inline-block bg-warning bg-light rounded mb-2" style="position: relative">
+                            <div class="row m-2"><div class="col">Please solve the captcha & press enter</div></div>
+                            <img src='/captcha.jpg' id="captchaImg" class="mx-auto d-block" style="z-index: 1"; /> 
+                            <a href="" id="refreshCaptchaLink" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Reload captcha image">
+                                <img id="refreshIcon" 
+                                    src="/img/misc-icons/noun_Refresh_1247719-100x87.png" 
+                                    style="height: 28px; width:26px; position: absolute; bottom: 10px; right: 45px;  z-index: 2"
+                                />
+                            </a>
+                            <div class="col w-100">
+                                <input class="d-block mt-2 mb-2 mx-auto ps-3" 
+                                minlength="4" 
+                                maxlength="4" type="text" name="captcha" id="captcha" 
+                                size="4" placeholder="X X X X"
+                                style="background-color: lightgray; border: 0" />
+
+                            </div>
+                        </div><!-- end #myCaptcha -->
+                        
+                    </div>
+                </div>
+            </form>
+            <div class="col w-100 text-center">
+                            <button id="finishBtn" type="button" class="d-inline-block btn-primary rounded mb-sm-4">Create poll</button>
+                        </div>
+
+        </div> <!-- end div.myPollForm -->
+    </div> <!-- end container -->
+
+<!-- Modal -->
+<div class="modal fade" id="duplicate-check-help" tabindex="-1" aria-labelledby="dupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dupModalLabel">Duplicate vote prevention options</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To discourage users from voting more than once, several strategies can be used. No strategy is foolproof.</p>
+        <p><b>Cookie check: </b>A cookie will be set in the visitor's browser when they vote and no further votes will be allowed on this poll once the cookie is set. Note: A determined "cheater" can clear his or her browser cookies or use a different browser to vote more than once to defeat this option.</p>
+        <p><b>IP Address check: </b>A visitor's IP address will be recorded and no further votes on this poll will be allowed from that address. Note: Because some environments share a single IP address, e.g. some corporations, schools, & hospitals, this option is not ideal if distributing your survey to multiple recipients in an organization that might be sharing an IP.</p>
+        <p><b>Both: </b>Both cookie checks and IP address checks will be performed.</p>
+        <p><b>None: </b>No protective measure will be put in place.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!--
+<div class="container bg-secondary">
+<div class="rounded py-4 myPollForm">
+    <form id="pollForm" autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
+        <div class="field" id="qField">
+            <label for="question" id="qLabel">Enter poll question</label>
+            <input type="text" class="textInput mx-3" name="question" id="question" required>
+        </div>
+
+    </form> 
+</div> 
+</div>
+-->
