@@ -11,8 +11,8 @@ const path = require('path');
 const captcha = require('svg-captcha-express').create({
     cookie: 'captcha',
     size: 4,
-    height: 125,
-    width: 220
+    height: 145,
+    width: 238
 });
 //load custom font (optional)
 captcha.loadFont(path.join(__dirname, '/static/Comismsh.ttf'));
@@ -121,25 +121,45 @@ app.get('/', function (req, res) {
 
 // POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
-    const { question, answers, ipCheck, cookieCheck } = req.body;
-    /*
+    const { question, answers, ipCheck, cookieCheck, captchaInput } = req.body;
+    console.log("app.js:125 captchaInput: " + captchaInput);
     const validCaptcha = captcha.check(req, captchaInput);
     if (!validCaptcha) {
         console.log("Invalid captcha");
-        //return res.end('Invalid Captcha!');
-
-        res.render('pages/index',
-        {
-            answers: answers,
-            question: question,
-            ipCheck: ipCheck,
-            cookieCheck: cookieCheck,
-            failedCaptcha: true,
-        })
+        return res.send({ "captchaPass": false });
     }
 
-    console.log("Valid captcha");
-    */
+    const votes = new Array(answers.length);
+    votes.fill(0);
+    (async function postPoll() {
+        const newPollId = await genPollId();
+        const newPoll = new Poll({
+            question: question,
+            answers: answers,
+            votes: votes,
+            pollID: newPollId,
+            ipCheck: ipCheck,
+            cookieCheck: cookieCheck,
+            ipAddresses: []
+        });
+        try {
+            let resultPoll = await newPoll.save();
+            const url = '/pollCreated/' + newPollId;
+            //res.redirect(url); this sends the actual html of url page
+            res.status(200).send({ captchaPass: true, result: 'redirect', url: url })
+        }
+        catch (err) {
+            console.log("Error on creating poll: " + err);
+            res.status(500).send(err);
+        }
+    })();
+});
+
+/*
+// POST to / will create a poll when "poll form" is "submitted"
+app.post('/', function (req, res) {
+    const { question, answers, ipCheck, cookieCheck } = req.body;
+
     const votes = new Array(answers.length);
     votes.fill(0);
     (async function postPoll() {
@@ -165,7 +185,7 @@ app.post('/', function (req, res) {
         }
     })();
 });
-
+*/
 app.post('/checkCaptcha', function (req, res) {
     console.log("app.js:166 req.data: " + req.data);
     

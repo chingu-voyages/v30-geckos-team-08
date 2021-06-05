@@ -4,28 +4,28 @@ let numAnswers = 2;
 let dupProtection = 1; // off = 1, cookie = 2, ip = 3, both = 4
 
 function setInputWidth() { // Form input fields dynamically resize
-    const newWidth = $('#qField').width() - 32;
-    $('.textInput').width(newWidth);
+    $('.textInput').width($('#qField').width() - 32);
 }
 
 $(document).ready(function () {
 
     $('#refreshIcon').hover(function () {
         console.log("running hover handler");
-        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-hover-100x87.png");
+        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-hover-100x87.png")
+            .removeClass('refreshIconOrig').addClass('refreshIconHover');
      });
     
     $('#refreshIcon').mouseleave(function () {
         console.log('running mouseleave');
-        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-100x87.png");
-
+        $('#refreshIcon').attr("src", "/img/misc-icons/noun_Refresh_1247719-100x87.png")
+            .removeClass('refreshIconOrig').addClass('refreshIconHover');
     });
     $('#refreshCaptchaLink').click(function (e) {
-        e.preventDefault();
-        const id = Math.random();
-        $('#captchaImg').attr('src', '/captcha.jpg?id=' + id);
+        e.preventDefault(); // force a new Captcha to be made/shown
+        $('#captchaImg').attr('src', '/captcha.jpg?id=' + Math.random());
     });
 
+    /* WAS WORKING
     $("form#captchaForm").on('submit', function (e) {
         e.preventDefault();
         var data = $('#captcha').val();
@@ -43,7 +43,68 @@ $(document).ready(function () {
                 console.log("poll-create-form.js:26 ERROR: " + e);
             }
         });
-    });
+    }); */
+
+    $("form#captchaForm").on('submit', function (e) {
+        e.preventDefault();
+        if ($('#pollForm').valid()) {
+            let myAnswers = [];
+            for (let n = 1; n <= numAnswers; n++){
+                myAnswers.push($('#answer' + n).val());
+            }
+            let cookieCheck = false;
+            let ipCheck = false;
+
+            if (dupProtection == 2 || dupProtection == 4) ipCheck = true;
+            if (dupProtection == 3 || dupProtection == 4) cookieCheck = true;
+        
+            const mydata = {
+                "question": $('#question').val(),
+                "answers": myAnswers,
+                "cookieCheck": cookieCheck,
+                "ipCheck": ipCheck,
+                "captchaInput": $('#captcha').val()
+            }
+            $.ajax({
+                type: 'post',
+                url: '/',
+                data: mydata,
+                success: function(result){
+                    console.log("poll-create-form.js:73 captchacheck returned");
+                    
+                    if (result.captchaPass == false)
+                        console.log("Captcha failed");
+                    else {
+                        console.log("Captcha passed");
+                        console.log("result.url: " + result.url);
+                    }
+                    // could do the window location replace
+                },
+                error: function (e) {
+                    console.log("poll-create-form.js:77 ERROR: " + e);
+                }
+            })
+        }
+        /*
+        var data = $('#captcha').val();
+        
+        console.log("poll-create-form.js:16 data: " + data);
+        $.ajax({
+            type: 'post',
+            url: '/checkCaptcha',
+            data: {one: data},
+            dataType: 'text',
+            success: function (result) {
+                console.log("poll-create-form.js:23 success result: " + result);
+
+            },
+            error: function (e) {
+                console.log("poll-create-form.js:26 ERROR: " + e);
+            }
+        });
+        */
+    }); /* end captchaForm on submit
+
 
     setInputWidth(); // The form inputs dynamic resizing
     window.addEventListener('resize', setInputWidth);
@@ -205,6 +266,7 @@ $(document).ready(function () {
 
 
     // Event handler for when Finish button is clicked
+    /* WAS WORKING
     $('#finishBtn').click(function (e) {
         e.preventDefault();
         let myAnswers = []; // Collect all answers in myAnswers array
@@ -219,6 +281,8 @@ $(document).ready(function () {
         if (dupProtection == 3 || dupProtection == 4) cookieCheck = true;
         
         console.log("poll-create-form.js:186 captcha.val(): " + $('#captcha').val());
+        
+
         const mydata = {
             "question": $('#question').val(),
             "answers": myAnswers,
@@ -226,7 +290,8 @@ $(document).ready(function () {
             "ipCheck": ipCheck,
             "captchaInput": $('#captcha').val(),
         };
-        
+        console.log("poll-create-form.js:231 submitting: " + mydata);
+
         if ($('#pollForm').valid()) {
             console.log('js:193 pollForm valid');
             $.post('/', mydata, function (data, status) {
@@ -242,6 +307,7 @@ $(document).ready(function () {
             $('.error')[0].focus();
         }
     });
+    */
     
     /* For any .textInput, move to next input (text or "add answer" button) when return is pressed */
     $('.textInput').keydown(function (e) {
@@ -262,6 +328,9 @@ $(document).ready(function () {
         if($('#question').val().length > 0){
             if($('#answers').is(':hidden')){
                 $('#answers').slideDown('slow');
+            }
+            if ($('#bottom').is(':hidden')) {
+                $('#bottom').slideDown('slow');
             }
         }
     });

@@ -8,6 +8,16 @@ form#pollForm {
   /*  border-radius: 50%; this was the last thing I commented. I think it was meant for outer div and is nonsense */
 }
 
+@media only screen and (max-width: 320px) {
+    #dropdownMenuButton1 {
+        position: relative;
+        right: 10px;
+    }
+}
+#outer1{
+    background-color: #ebedf0;
+    /* #ebedf0 or #d9e2ef */
+}
 form h2 {
     margin: 0 0 16px 0;
     padding: 0;
@@ -153,6 +163,14 @@ form input[type=submit] {
 }
 .help-pill:hover{ 
     color: #B2EBF2;
+}
+.refreshIconOrig{
+    border: 3px solid #3459d4;
+    border-radius: 50%;
+}
+.refreshIconHover{
+    border: 3px solid #0dcaf0;
+    border-radius: 50%;
 }
 #toolbar {
     margin-top: 15px;
