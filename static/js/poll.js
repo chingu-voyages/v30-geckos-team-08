@@ -1,4 +1,5 @@
-$('.ansButt').click(function(e){
+/** OLD 
+$('.ansButt').click(function (e) {
     e.preventDefault();
     let vote = $(this).data('index');
     //console.log("index: " + vote);
@@ -11,3 +12,14 @@ $('.ansButt').click(function(e){
     $('input[name="voteIndex"]').val(vote);
     $('#submitButton').removeClass('disabled hidden').addClass('d-inline-block');
 });
+**/
+$('.myRadio').click(function inputClicked(){
+    if ($(this).is(':checked')) {
+        let vote = $(this).data('index');
+        $("input[name='voteIndex']").val(vote);
+        console.log("setting vote to: " + vote);
+
+        $('#submitButton').removeClass('disabled hidden')
+            .addClass('d-inline-block');
+    }
+})

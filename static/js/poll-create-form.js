@@ -14,7 +14,6 @@ $(document).ready(function () {
         $('#refreshIconImg').attr("src", "/img/misc-icons/noun_Refresh_Hover_100x100.png")
         $('#refreshIcon').removeClass('refreshIconOrig').addClass('refreshIconHover');
      });
-    
     $('#refreshIcon').mouseleave(function () {
         console.log('running mouseleave');
         $('#refreshIconImg').attr("src", "/img/misc-icons/noun_Refresh_100x100.png")
@@ -25,27 +24,7 @@ $(document).ready(function () {
         $('#captchaImg').attr('src', '/captcha.jpg?id=' + Math.random())
             .removeClass('hidden');
     });
-
-    /* WAS WORKING
-    $("form#captchaForm").on('submit', function (e) {
-        e.preventDefault();
-        var data = $('#captcha').val();
-        console.log("poll-create-form.js:16 data: " + data);
-        $.ajax({
-            type: 'post',
-            url: '/checkCaptcha',
-            data: {one: data},
-            dataType: 'text',
-            success: function (result) {
-                console.log("poll-create-form.js:23 success result: " + result);
-
-            },
-            error: function (e) {
-                console.log("poll-create-form.js:26 ERROR: " + e);
-            }
-        });
-    }); */
-
+    /********************* FORM SUBMISSION  ***************/
     $("form#captchaForm").on('submit', function (e) {
         e.preventDefault();
         if ($('#pollForm').valid()) {
@@ -82,7 +61,7 @@ $(document).ready(function () {
                         console.log("result.url: " + result.url);
                         window.location.replace(result.url);
                     }
-                    // could do the window location replace
+
                 },
                 error: function (e) {
                     console.log("poll-create-form.js:77 ERROR: " + e);

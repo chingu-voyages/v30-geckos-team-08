@@ -7,7 +7,6 @@
 >
 <head>
     <%- include('../partials/head'); %>
-    <link rel="stylesheet" href="/css/poll.css">
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://poll-call.herokuapp.com/poll/<%=pollID%>" />
     <meta property="og:title" content="PollCall - <%=question%>" />
@@ -23,28 +22,40 @@
     <meta property="og:image:alt" content="PollCall logo and pie graph with colorful wedges" />
     <meta property="og:site_name" content="PollCall">
 </head>
-<body>
-<div id="bootstrap-body" class="container-md px-0">
+<body class="container-md px-0">
 
 <header>
     <%- include('../partials/navbar'); %>
 </header>
 
 <main>
-    <div class="jumbotron pb-3">
+    <div class="jumbotron">
         <h1 class="text-center display-2 heading">Cast your vote</h1>
         <p class="text-center display-6 mt-sm-1"><%=question%></p>
     </div>
-</main>
-    <div id="takePollDiv" class="mx-0 pt-5 pb-4 px-4 rounded">
+
+    <div id="takePollDiv" class="m-5 p-4 rounded">
         <% 
         answers.forEach(function(answer, index){ %>
-            <div class="col py-3 w-100">
-                <label class="cont"><%=answer%>
-                    <input type="radio" class="myRadio" name="radio" data-index="<%-index%>">
-                    <span class="checkmark"></span>    
-                </label>
-            </div>
+                <div class="row">
+                    <div class="col-2">
+                        <button class="btn ansButt btn-secondary d-inline-block mb-4" 
+                        type="button"
+                        data-index="<%-index%>""
+                        >
+                            Choose
+                        </button>
+                    </div>
+                    <div class="col">
+                        <div id="ansDiv<%-index%>" 
+                            data-index="<%-index%>" 
+                            class="takePollAnsDiv w-100 p-2 rounded d-inline-block"
+                        >
+                            <span><%=answer%></span>
+                        </div>
+                    </div>
+                </div> <!-- end row -->
+
         <% }); %>
     </div> <!-- end takePollDiv -->
 
@@ -59,9 +70,6 @@
 </main>
 
 <footer>
-    <div class="container mt-5 pt-3 mb-3">
-        This poll was created by an anonymous user and neither created nor endorsed by PollCall.
-    </div>
     <%- include('../partials/footer'); %>
     <script src="/js/poll.js"></script>
 
@@ -72,6 +80,6 @@
 
 </script>
 </footer>
-</div> <!-- end bootstrap-body -->
+
 </body>
 </html>

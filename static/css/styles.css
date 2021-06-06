@@ -14,24 +14,16 @@
     position: relative;
     left: 16px;
 }
-#takePollDiv{
-    background-color: #ebedf0;
-    margin-bottom: 24px;
-}
+/* OLD
 .takePollAnsDiv{
     background-color: hsl(172, 53%, 83%);
     margin-bottom: 15px;
 }
 .highlightAns{
     border: 2px solid #3459d4;
-}
+} */
 .hidden{
     display: none;
-}
-.voteBtn{
-        background-color: #63bd7e;
-        width: 10rem;
-        height: 4rem;
 }
 .heading{
     margin-top: 40px;
