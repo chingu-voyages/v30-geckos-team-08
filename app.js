@@ -21,7 +21,7 @@ const captcha = svgCaptcha.create({
     background: '#cc9966'
 }); */
 
-console.log(svgCaptcha.options);
+//console.log(svgCaptcha.options);
 
 //load custom font for Captcha - this was for removed svg-express-captcha
 // can remove font
@@ -74,7 +74,7 @@ app.use(bodyParser.urlencoded({
 // Decodes the JWT and saves the list as array in req.userPolls
 app.use(function (req, res, next) {
     if (!req.cookies.jwt) {
-        console.log("app.js:80 no req.cookies.jwt!");
+        //console.log("app.js:80 no req.cookies.jwt!");
         req.userPolls = [];
         next();
     }
@@ -84,7 +84,7 @@ app.use(function (req, res, next) {
             decoded = jwt.verify(req.cookies.jwt, JWTKEY);
         }
         catch (err) {
-            console.log("error app.js:89 - " + err);
+            console.log("Error decoding cookie jwt in app.js:89 - " + err);
             req.userPolls = [];
             res.cookie('jwt', "", {
                 expires: new Date(Date.now() - (100 * 24 * 60 * 60 * 1000)), httpOnly: true, sameSite: 'Strict'
@@ -153,13 +153,13 @@ app.get('/', function (req, res) {
 // POST to / will create a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
     const { question, answers, ipCheck, cookieCheck, captchaInput } = req.body;
-    console.log("app.js:125 captchaInput: " + captchaInput);
+    //console.log("app.js:125 captchaInput: " + captchaInput);
     // old version of svg-express-captcha
     // const validCaptcha = captcha.check(req, captchaInput);
     const validCaptcha = (captchaInput == req.session.captcha);
     
     if (!validCaptcha) {
-        console.log("Invalid captcha");
+        //console.log("Invalid captcha");
         return res.send({ "captchaPass": false });
     }
 
@@ -188,29 +188,31 @@ app.post('/', function (req, res) {
             })
         }
         catch (err) {
-            console.log("Error on creating poll: " + err);
-            res.status(500).send(err);
+            console.log("Error on creating poll in app.js:191: " + err);
+            return res.render("pages/not-found.ejs", {
+                pageTitle: "Error creating poll: " + err
+            });
         }
     })();
 });
 
 app.post('/checkCaptcha', function (req, res) {
-    console.log("app.js:166 req.data: " + req.data);
+    //console.log("app.js:166 req.data: " + req.data);
     
-    console.log("app.js:165 req.body.data: " + req.body.data);
-    console.log("app.js:169 req.body: " + req.body);
-    console.dir(req.body);
+    //console.log("app.js:165 req.body.data: " + req.body.data);
+    //console.log("app.js:169 req.body: " + req.body);
+    //console.dir(req.body);
     const input = req.body.one;
-    console.log("input: " + input);
+    //console.log("input: " + input);
 
     const validCaptcha = captcha.check(req, input);
     if (!validCaptcha) {
-        console.log("Invalid captcha");
+        //console.log("Invalid captcha");
         return res.send(false);
         //return res.end('Invalid Captcha!');
     }
     else {
-        console.log("Valid capture");
+        //console.log("Valid capture");
         return res.send(true);
     }
 });
@@ -223,14 +225,14 @@ app.get("/pollCreated/:pollId", function (req, res) {
     query.exec(function (err, result) {
         if (err) {
             const errString = "Error looking up poll of with id of " + pollID + ": " + err;
-            console.log(errString);
+            console.log("Error in lookup of poll " + pollID + ": " + errString);
             return res.render("pages/not-found.ejs", {
                 pageTitle: errString
             });
         }
         else {
             if (!result) {
-                console.log("No poll with this id found: " + pollID);
+                //console.log("No poll with this id found: " + pollID);
                 return res.render("pages/not-found.ejs", {
                     pageTitle: "Poll not found!"
                 })
@@ -258,7 +260,7 @@ app.get('/about', function (req, res) {
 // Route to take a poll
 // Example: http://localhost:8080/poll/Xh-lEJ
 app.get('/poll/:id', function (req, res) {
-    console.log("app.js:168 getpoll and req.userPolls: " + req.userPolls);
+    //console.log("app.js:168 getpoll and req.userPolls: " + req.userPolls);
 
     // Lookup the poll
     const paramPollID = req.params.id;
@@ -273,10 +275,11 @@ app.get('/poll/:id', function (req, res) {
         }
         else {
             if (!result) {
-                console.log("not found app.js:230");
+                //console.log("Poll " + paramPollID + " not found app.js:230");
                 return res.render("pages/not-found.ejs", {
-                    pageTitle: "Poll not found!"
+                    pageTitle: "Poll " + paramPollID + " not found!"
                 });
+                
             }
             const thePoll = new Poll(result);
             res.render("pages/poll", {
@@ -294,7 +297,7 @@ app.get('/poll/:id', function (req, res) {
 // The results page
 // Example: http://localhost:8080/results/Xh-lEJ
 app.get('/results/:id', function (req, res) {
-    console.log("app.js:192 req.userPolls: " + req.userPolls);
+    //console.log("app.js:192 req.userPolls: " + req.userPolls);
 
     // Lookup the poll
     const paramPollID = req.params.id;
@@ -315,7 +318,7 @@ app.get('/results/:id', function (req, res) {
 
             const answerColors = getColors(thePoll.startColor, thePoll.answers.length);
 
-            console.log("286 answerColors: " + answerColors);
+            //console.log("286 answerColors: " + answerColors);
 
             res.render("pages/results", {
                 pageTitle: "PollCall - Results: " + thePoll.question,
@@ -337,12 +340,12 @@ app.get('/results/:id', function (req, res) {
 
 app.post('/results/:pollId', function (req, res) {
 
-    console.log('app.js:230 entering post to results & req.userPolls: ' + req.userPolls);
+    //console.log('app.js:230 entering post to results & req.userPolls: ' + req.userPolls);
     const paramPollID = req.params.pollId;
 
     // Easiest to always set 
     if (!req.userPolls) {
-        console.log("app.js:235 !req.userPolls");
+        //console.log("app.js:235 !req.userPolls");
         req.userPolls = [];
     }
     
@@ -369,7 +372,7 @@ app.post('/results/:pollId', function (req, res) {
             else if ((req.userPolls.includes(paramPollID) && thePoll.cookieCheck) ||
                 (thePoll.ipAddresses.includes(getClientIp(req)) && thePoll.ipCheck == true))
             {
-                console.log("app.js:255 Duplicate votes protection triggered!");
+                //console.log("app.js:255 Duplicate votes protection triggered!");
                 return res.render("pages/results", {
                     pageTitle: "You've already voted once before!",
                     question: thePoll.question,
@@ -386,7 +389,7 @@ app.post('/results/:pollId', function (req, res) {
             }
             if (thePoll.ipCheck) {
                 const ip = getClientIp(req);
-                console.log("Retrieved client ip for record: " + ip);
+                console.log("Retrieved client ip address and adding to poll record. ip address: " + ip);
                 if (!thePoll.ipAddresses.includes(ip)) {
                     thePoll.ipAddresses.push(ip);
                 }
@@ -415,7 +418,7 @@ app.post('/results/:pollId', function (req, res) {
                 })(); // end iife
             } // end try
             catch (err) {
-                console.log("Error saving poll: " + err);
+                console.log("Error saving poll " + resultPoll.pollID + ": " + err);
                 res.status(500).send(err);
             }
         }
