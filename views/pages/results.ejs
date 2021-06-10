@@ -17,8 +17,9 @@
         property="og:description" 
         content="PollCall Poll Results, '<%= question %>' - PollCall lets you easily create polls and share them for voting - all without logging in." 
     /> 
-    <!-- suggested size 1200x627 --> ?id=' + Math.random()
-    <meta property="og:image" content="https://poll-call.herokuapp.com/results/img/<%=pollID%> + "?id=" + Math.random() + ".png" />
+    <!-- suggested size 1200x627 -->
+    <% let resultsImgUrl = "https://poll-call.herokuapp.com/results/img/" + pollID + ".png?id=" + Math.random(); %>
+    <meta property="og:image" content="<%-resultsImgUrl%>" />
     <!-- 
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="627">
