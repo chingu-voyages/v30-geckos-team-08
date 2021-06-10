@@ -156,7 +156,7 @@ form input[type=submit] {
 }
 .help-pill{
     text-decoration: none;
-    color: #3459d4;
+    color: #829775;
 }
 .help-pill:hover{ 
     color: #B2EBF2;
@@ -182,7 +182,11 @@ form input[type=submit] {
     border-radius: 50%;
 }
 #myCaptcha{
-    /* position: relative; */
+    background-color: #ebedf0;
+}
+/* the input */
+#captcha{
+    border: 1px solid #bdb5ab;
 }
 #captchaPic{
     width: 245px;
@@ -200,6 +204,7 @@ form input[type=submit] {
     position: relative;
     top: 0;
     left: 0;
+    border: 1px solid #bdb5ab;
 }
 #toolbar {
     margin-top: 15px;
@@ -208,7 +213,7 @@ form input[type=submit] {
 
 #addAnswerBtn,
 #finishBtn {
-    background-color: #63bd7e;
+    background-color: #829775;
     width: 10rem;
     height: 4rem;
 }

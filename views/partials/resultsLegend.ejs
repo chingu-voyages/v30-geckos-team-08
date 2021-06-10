@@ -1,0 +1,36 @@
+<div class="container-md">
+<div class="row">
+    <div class="col text-center h3 mb-4">
+        <%=question%>
+    </div>
+</div><!-- end row -->
+    <% answers.forEach((answer, index) => { %>
+        <div class="row text-center">
+            <div class="col-2">
+                <div class="color" style="background-color: <%=answerColors[index]%>; width: '100px'; height: '30px';">
+                    <%- String.fromCharCode(65 + index) %> 
+                </div>
+            </div>
+            <div class="col-6 text-left">
+                <%=answer%>
+            </div>
+            <div class="col-2 text-center">
+                Votes: <%=votes[index]%>
+            </div>
+            <div class="col-2 text-center">
+                <%= Math.round(round(votes[index]/totalVotes, 2)*100) %>%
+            </div>
+        </div>
+        <hr class="my-1" />
+    <% }); %>
+    <!--
+    <div class="row text-center">
+        <div class="col-2">
+            <div class="color" backgroundColor=""></div>
+        </div>
+        <div class="col-10 text-start">
+            The answer.
+        </div>
+    </div>
+    --->
+</div> <!-- end containter-md -->

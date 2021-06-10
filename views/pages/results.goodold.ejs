@@ -7,8 +7,6 @@
 >
 <head>
     <%- include('../partials/head'); %>
-    <link rel="stylesheet" type="text/css" href="/css/3rd-party/jquery.dataTables.css">
-
     <meta property="og:type" content="article" /> 
     <!-- Use this for subpages  <meta property="og:type" content="article" /> -->
     <meta property="og:url" content="https://poll-call.herokuapp.com/results/<%=pollID%>" />
@@ -17,8 +15,8 @@
         property="og:description" 
         content="PollCall Poll Results, '<%= question %>' - PollCall lets you easily create polls and share them for voting - all without logging in." 
     /> 
-    <!-- suggested size 1200x627 --> ?id=' + Math.random()
-    <meta property="og:image" content="https://poll-call.herokuapp.com/results/img/<%=pollID%> + "?id=" + Math.random() + ".png" />
+    <!-- suggested size 1200x627 -->
+    <meta property="og:image" content="https://poll-call.herokuapp.com/results/img/<%=pollID%>.png" />
     <!-- 
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="627">
@@ -43,61 +41,22 @@
             <h1 class="heading">Thanks for voting!</h1>
             <h1 class="text-center display-2 heading">Thanks for voting!</h1>
         <%} else { %>
-            <h1 class="text-center display-2 heading mb-5">Poll results</h1>
+            <h1 class="text-center display-2 heading">Poll results</h1>
         <% } %>
-        <div class="row mb-3">
-            <div class="col text-center">
-                Total votes cast: <%-totalVotes%>
+        <div class="row mb-5">
+            <% 
+            let count = 0;
+            for(let i = 0; i < votes.length; i++){
+                count += votes[i];
+            } 
+            %> 
+            <div class="col">
+                Total votes cast: <%-count%>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col text-center">
-                <%=question%>
-            </div>
-        </div>
-            <!-- < include('../partials/resultsLegend'); %> -->
         </div>
     </div> <!-- end jumbotron-->
-    <div class="container-md">
-        <table id="resultTable" class="table table-striped w-100">
-            <thead>
-                <tr>
-                    <th>Key</th>
-                    <th>Answer</th>
-                    <th># Votes</th>
-                    <th>% of Votes</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% answers.forEach((answer, index) => { %>
-                    <tr>
-                        <td>
-                            <h3><span class="badge badge-pill badge-primary" style="background-color: <%=answerColors[index]%>;">
-                                <%- String.fromCharCode(65 + index) %>
-                            </span></h3>
-                        </td>
-                        <td><%=answer%></td>
-                        <td><%=votes[index]%></td>
-                        <td><%= Math.round(round(votes[index]/totalVotes, 2)*100) %>%</td>
-                    </tr>
-            <%    }); %>
-            </tbody>
-            <tfoot>
-            </tfoot>
-        </table>
-
-
-
-    </div>
-
     <div class="mt-4 resultChart mb-4">
         <img class="img-fluid" src="/results/img/<%=pollID%>.png">
-    </div>
-    <hr class="mt-2 mb-2">
-    
-    <div class="resultChart mb-4">
-        <img class="img-fluid" src="/results/bar-img/<%=pollID%>.png">
-
     </div>
 
     <%- 
@@ -120,18 +79,6 @@
     <script>
         console.log("results.ejs accessed")
     </script>
-    <script type="text/javascript" charset="utf8" src="/js/3rd-party/jquery.dataTables.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#resultTable').DataTable({
-                "order": [[3, 'desc']],
-                "searching": false,
-                "paging": false,
-                "info": false,
-            });
-        } );
-    </script>
-
 </footer>
 
 </body>

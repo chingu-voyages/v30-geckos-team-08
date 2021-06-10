@@ -30,6 +30,7 @@
     "mongoose": "^5.12.8",
     "nanoid": "^3.1.23",
     "node-fetch": "^2.6.1",
+    "ppfun-captcha": "^1.6.4",
     "svg-captcha-express": "^1.0.8"
   },
   "devDependencies": {

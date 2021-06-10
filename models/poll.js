@@ -19,7 +19,8 @@ const PollSchema = new Schema({
     //privateResults: Boolean, // no longer needed unless we add feature later
     ipCheck: Boolean,
     cookieCheck: Boolean,
-    ipAddresses: [String]
+    ipAddresses: [String],
+    startColor: Number,
 });
 
 // Convert PollSchema into a Model we can work with

@@ -1,7 +1,7 @@
 <!-- <div class="container px-0 mw-lg-80 mw-md-90"> -->
 <div class="container-md px-0">
     <div class="myPollForm rounded px-2 mx-2 my-4" style="margin-bottom: 24px;">
-        <form autocomplete="off" id="pollForm" class="pt-4 px-1" action="/" method="POST" enctype="multipart/form-data">
+        <form autocomplete="off" id="pollForm" class="pt-4 pb-3 px-1" action="/" method="POST" enctype="multipart/form-data">
             <div class="field" id="qField">
                 <label id="qLabel" class="" for="question">Enter poll question</label>
                 <input type="text" class="textInput mb-2" name="question" id="question" required>
@@ -19,7 +19,7 @@
 
                 <div class="row d-flex justify-content-evenly">
                     <div class="col text-center">
-                        <button id="addAnswerBtn" class="d-inline-block btn-primary rounded mb-sm-3">Add another answer
+                        <button id="addAnswerBtn" class="d-inline-block btn-primary mt-2 rounded">Add another answer
                         </button>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
         </form>
 
         <div id="bottom" class="hidden">
-            <div class="container my-2 ps-1 pt-3 border rounded bg-light">
+            <div class="container my-2 px-1 pt-3 border rounded bg-light">
                 <div class="rounded px-3 py-1" id="outer1">
                     <div class="row my-2">
                         <div class="col-9 ps-2 pe-0 ms-1 me-0 text-start">
@@ -66,7 +66,7 @@
                 <form method="POST" id="captchaForm" class="mt-0">
                     <div class="row text-center">
                         <div class="col w-100">
-                            <div id="myCaptcha" class="d-inline-block bg-warning bg-light rounded mt-1 mb-2">
+                            <div id="myCaptcha" class="d-inline-block rounded mt-4 pb-2 mb-4">
                                 <div class="row m-3">
                                     <div class="col">To finish, solve the captcha & press ENTER</div>
                                 </div> <!-- end row with m-3 -->
@@ -85,17 +85,16 @@
                                         </a>
                                     </div>
                                 </div>
-
                                 <div class="col">
 
-                                    <input class="d-block mt-2 mb-2 ps-2 mx-auto" minlength="4" maxlength="4"
+                                    <input class="d-block mt-3 mb-2 ps-2 mx-auto" minlength="4" maxlength="4"
                                         type="text" name="captcha" id="captcha" size="4" placeholder="XXXX"
                                         autocomplete="off" title="Input the captcha & press ENTER"
-                                        style="background-color: lightgray; border: 0; border:0; box-shadow:0 0 15px 4px rgba(0,0,0,0.06); letter-spacing: 2px; width:73px" />
+                                        style="background-color: lightgray; box-shadow:0 0 15px 4px rgba(0,0,0,0.06); letter-spacing: 2px; width:73px" />
 
                                 </div>
                             </div><!-- end #myCaptcha -->
-
+                            
                         </div>
                     </div>
                 </form>
@@ -140,20 +139,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-<!--
-<div class="container bg-secondary">
-<div class="rounded py-4 myPollForm">
-    <form id="pollForm" autocomplete="off" id="pollForm" action="/" method="POST" enctype="multipart/form-data">
-        <div class="field" id="qField">
-            <label for="question" id="qLabel">Enter poll question</label>
-            <input type="text" class="textInput mx-3" name="question" id="question" required>
-        </div>
-
-    </form> 
-</div> 
-</div>
--->

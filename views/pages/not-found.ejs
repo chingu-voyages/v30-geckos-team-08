@@ -9,8 +9,7 @@
     <%- include('../partials/head'); %>
     <link rel="stylesheet" href="/css/poll.css">
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://poll-call.herokuapp.com/poll/<%=pollID%>" />
-    <meta property="og:title" content="PollCall - <%=question%>" />
+    <meta property="og:title" content="PollCall - Create polls & share them with friends... All without logging in!" />
     <meta 
         property="og:description" 
         content="Make your opinion known! PollCall lets you easily create polls and share them for voting - all without logging in. Collect votes & gauge opinions. Come back to check the results of your polls anytime!" 
@@ -32,41 +31,22 @@
 
 <main>
     <div class="jumbotron pb-3">
-        <h1 class="text-center display-2 heading">Cast your vote</h1>
-        <p class="text-center display-6 mt-sm-1"><%=question%></p>
+        <h1 class="text-center display-2 heading"><%=pageTitle%></h1>
+        <p class="text-center display-6 mt-sm-1"></p>
     </div>
 </main>
+
     <div id="takePollDiv" class="mx-0 pt-5 pb-4 px-4 rounded">
-        <% 
-        answers.forEach(function(answer, index){ %>
-            <div class="col py-3 w-100">
-                <label class="cont"><%=answer%>
-                    <input type="radio" class="myRadio" name="radio" data-index="<%-index%>">
-                    <span class="checkmark"></span>    
-                </label>
-            </div>
-        <% }); %>
+        <span>Return <a href="/">home</a></span>
     </div> <!-- end takePollDiv -->
 
-    <div class="text-center">
-        <form action="/results/<%=pollID%>" method="POST">
-            <input name="voteIndex" type="hidden">
-            <button type="submit" id="submitButton" class="btn-primary disabled hidden btn voteBtn mt-4">
-                Submit vote
-            </button>    
-        </form>
-    </div>
 </main>
 
 <footer>
-    <div class="container mt-5 pt-3 mb-3 text-center">
-        This poll was created by an anonymous user and was neither created nor is it endorsed by <a href="https://poll-call.herokupp.com/">PollCall</a>.
-    </div>
     <%- include('../partials/footer'); %>
-    <script src="/js/poll.js"></script>
 
     <script>
-        console.log("poll.ejs accessed")
+        console.log("not-found.ejs accessed")
     </script>
     <script>
 
