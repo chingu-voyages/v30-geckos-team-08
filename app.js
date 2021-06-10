@@ -10,22 +10,7 @@ const path = require('path');
 const getColors = require('./color-helper');
 
 // Dumped svg-captcha-express in favor of its fork, ppfun-captcha with security bugfix
-var svgCaptcha = require('ppfun-captcha');
-
-/*
-const captcha = svgCaptcha.create({
-    //cookie: 'captcha',
-    size: 4,
-    height: 175,
-    width: 245,
-    background: '#cc9966'
-}); */
-
-//console.log(svgCaptcha.options);
-
-//load custom font for Captcha - this was for removed svg-express-captcha
-// can remove font
-//captcha.loadFont(path.join(__dirname, '/static/Comismsh.ttf'));
+const svgCaptcha = require('ppfun-captcha');
 
 // Allow access to variables in .env file
 require("dotenv").config();
@@ -46,32 +31,25 @@ app.use(
 );
 
 const Poll = require('./models/poll');
-
-// Below per https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
 });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 
-// puts cookies in req.headers.cookie - SUPPOSED to put them in req.cookies
-app.use(cookieParser()); 
+app.use(cookieParser()); // puts cookies in req.body
+app.use(express.static(__dirname + '/static')); // serve static files from this directory
 
-// Static folder to serve from https://expressjs.com/en/starter/static-files.html
-app.use(express.static(__dirname + '/static')); // Tested by http://localhost:8080/img/kitten.jpg
 
-//app.use(express.json());
-
-// using body parser to parse the body of incoming post requests
+// Message about deprecation - tried switching to use express.urlencoded (see below) but variables not populated?
 app.use(bodyParser.urlencoded({
-    extended: true, // must give a value for extended
+    extended: true, // Use body parser to parse body and populate req variables
   })
 );
+//app.use(express.urlencoded()); // Parse URL-encoded bodies - Suggested alternative to deprecated bodyParser above
 
-//app.use(express.urlencoded()); //Parse URL-encoded bodies
-
-// Middleware that reads cookie from requests to obtain list of polls user has taken already.
-// Decodes the JWT and saves the list as array in req.userPolls
+// Middleware - reads cookie from requests to obtain list of polls user has taken already.
+// Decodes the JWT and saves the list of polls taken as array in req.userPolls
 app.use(function (req, res, next) {
     if (!req.cookies.jwt) {
         //console.log("app.js:80 no req.cookies.jwt!");
@@ -89,45 +67,26 @@ app.use(function (req, res, next) {
             res.cookie('jwt', "", {
                 expires: new Date(Date.now() - (100 * 24 * 60 * 60 * 1000)), httpOnly: true, sameSite: 'Strict'
             });
-            next();
-            // May want to set to expire here!
+            next(); // May want to set to expire here!
         }
         req.userPolls = decoded.polls;
-        //console.log("app.js:95 req.userPolls: " + req.userPolls);
         next();
     }
 })
 
-
-// https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
-//  We can use res.render to load up an ejs view file
 app.set("views", __dirname + "/views");
-app.set('view engine', "ejs");
-// serves ./views/pages/index.ejs, passes aVariable to page
+app.set('view engine', "ejs"); //  res.render to load up an ejs view file (serve ./views/pages/index.ejs)
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', () => { // Maybe unnecessary or maybe better way to close connection
     server.close(() => {
         mongoose.connection.close();
         console.log('SIGTERM received. Process terminated.');
     });
 });
 
-const server = app.listen(port, function () {
-    console.log('app.js running on port: ' + port);
-});
+const server = app.listen(port, function () { console.log('app.js running on port: ' + port) });
 
-/* OLD form from svg-express-captcha */
-//app.get('/captcha.jpg', captcha.image()); 
-//app.get(captchaMathUrl, captcha.math());
-
-/* const captcha = svgCaptcha.create({
-    //cookie: 'captcha',
-    size: 4,
-    height: 175,
-    width: 245,
-    background: '#cc9966'
-}); */
-
+// TODO: Cleanup and change to svg extension - but saved "Incorrect captcha" image must be svg'd
 app.get('/captcha.jpg', function (req, res) {
     var captcha = svgCaptcha.create(
         {
@@ -150,20 +109,16 @@ app.get('/', function (req, res) {
         });
 });
 
-// POST to / will create a poll when "poll form" is "submitted"
+// POST to / creates a poll when "poll form" is "submitted"
 app.post('/', function (req, res) {
     const { question, answers, ipCheck, cookieCheck, captchaInput } = req.body;
-    //console.log("app.js:125 captchaInput: " + captchaInput);
-    // old version of svg-express-captcha
-    // const validCaptcha = captcha.check(req, captchaInput);
     const validCaptcha = (captchaInput == req.session.captcha);
     
     if (!validCaptcha) {
-        //console.log("Invalid captcha");
         return res.send({ "captchaPass": false });
     }
 
-    const votes = new Array(answers.length);
+    let votes = new Array(answers.length);
     votes.fill(0);
     (async function postPoll() {
         const newPollId = await genPollId();
@@ -190,42 +145,34 @@ app.post('/', function (req, res) {
         catch (err) {
             console.log("Error on creating poll in app.js:191: " + err);
             return res.render("pages/not-found.ejs", {
-                pageTitle: "Error creating poll: " + err
+                pageTitle: "Error creating new poll: " + err
             });
         }
     })();
 });
 
+// TODO: this may not be used any more?!!
+/*
 app.post('/checkCaptcha', function (req, res) {
-    //console.log("app.js:166 req.data: " + req.data);
-    
-    //console.log("app.js:165 req.body.data: " + req.body.data);
-    //console.log("app.js:169 req.body: " + req.body);
-    //console.dir(req.body);
-    const input = req.body.one;
-    //console.log("input: " + input);
 
-    const validCaptcha = captcha.check(req, input);
+    const validCaptcha = captcha.check(req, req.body.one);
     if (!validCaptcha) {
-        //console.log("Invalid captcha");
         return res.send(false);
-        //return res.end('Invalid Captcha!');
     }
     else {
-        //console.log("Valid capture");
         return res.send(true);
     }
-});
+}); */
 
 app.get("/pollCreated/:pollId", function (req, res) {
-    const pollID = req.params.pollId;
+    //const pollID = req.params.pollId;
     // Construct the query
-    var query = Poll.findOne({ pollID: pollID });
+    var query = Poll.findOne({ pollID: req.params.pollId });
     // Run the query
     query.exec(function (err, result) {
         if (err) {
-            const errString = "Error looking up poll of with id of " + pollID + ": " + err;
-            console.log("Error in lookup of poll " + pollID + ": " + errString);
+            const errString = "Error looking up poll of with id of " + req.params.pollId + ": " + err;
+            console.log("Error in lookup of poll " + req.params.pollId + ": " + errString);
             return res.render("pages/not-found.ejs", {
                 pageTitle: errString
             });
@@ -257,17 +204,13 @@ app.get('/about', function (req, res) {
         });
 });
 
-// Route to take a poll
-// Example: http://localhost:8080/poll/Xh-lEJ
-app.get('/poll/:id', function (req, res) {
-    //console.log("app.js:168 getpoll and req.userPolls: " + req.userPolls);
 
-    // Lookup the poll
+app.get('/poll/:id', function (req, res) { // Take a poll route
     const paramPollID = req.params.id;
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
-            //res.send("Error during poll lookup: " + err);
+            console.error("app.js:213 Error in poll lookup: " + err);
             return res.render("pages/not-found.ejs", {
                 pageTitle: "Error accessing poll: " + err
             
@@ -275,7 +218,6 @@ app.get('/poll/:id', function (req, res) {
         }
         else {
             if (!result) {
-                //console.log("Poll " + paramPollID + " not found app.js:230");
                 return res.render("pages/not-found.ejs", {
                     pageTitle: "Poll " + paramPollID + " not found!"
                 });
@@ -294,31 +236,22 @@ app.get('/poll/:id', function (req, res) {
     });
 });
 
-// The results page
-// Example: http://localhost:8080/results/Xh-lEJ
-app.get('/results/:id', function (req, res) {
-    //console.log("app.js:192 req.userPolls: " + req.userPolls);
-
-    // Lookup the poll
+app.get('/results/:id', function (req, res) { // results page route
     const paramPollID = req.params.id;
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
             return res.render("pages/not-found.ejs", {
-                pageTitle: "Error accessing poll: " + errr
+                pageTitle: "Error accessing poll " + paramPollID + ": " + err
             });
         }
         else {
             if (!result) {
                 return res.render('pages/not-found.ejs', {
-                    pageTitle: "Poll not found!"
+                    pageTitle: "Poll " + paramPollID + " not found"
                 });
             }
             const thePoll = new Poll(result);
-
-            const answerColors = getColors(thePoll.startColor, thePoll.answers.length);
-
-            //console.log("286 answerColors: " + answerColors);
 
             res.render("pages/results", {
                 pageTitle: "PollCall - Results: " + thePoll.question,
@@ -329,23 +262,17 @@ app.get('/results/:id', function (req, res) {
                 voted: false,
                 voteIndex: -1,
                 dupVote: false,
-                answerColors: answerColors,
+                answerColors: getColors(thePoll.startColor, thePoll.answers.length),
                 round: round,
                 totalVotes: thePoll.votes.reduce((a, b) => a + b, 0),
-
             })
         }
     });
 });
 
 app.post('/results/:pollId', function (req, res) {
-
-    //console.log('app.js:230 entering post to results & req.userPolls: ' + req.userPolls);
     const paramPollID = req.params.pollId;
-
-    // Easiest to always set 
     if (!req.userPolls) {
-        //console.log("app.js:235 !req.userPolls");
         req.userPolls = [];
     }
     
@@ -355,16 +282,14 @@ app.post('/results/:pollId', function (req, res) {
     var query = Poll.findOne({ pollID: paramPollID });
     query.exec(function (err, result) {
         if (err) {
-            res.send("Error during poll results lookup: " + err);
+            return res.render("pages/not-found.ejs", {
+                pageTitle: "Error accessing poll " + paramPollID + ": " + err
+            });
         }
         else {
             const thePoll = new Poll(result);
-
-            // never voted on this poll before so set cookie
-            if (!req.userPolls.includes(paramPollID)) {
-                //console.log('app.js:231 pushing to userPolls paramPollID: ' + paramPollID);
+            if (!req.userPolls.includes(paramPollID)) { // never voted on this poll before so set cookie
                 req.userPolls.push(paramPollID);
-                //console.log('req.userPolls is: ' + req.userPolls);
                 var token = jwt.sign({ polls: req.userPolls }, JWTKEY);
                 res.cookie('jwt', token, { expires: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)), httpOnly: true, sameSite: 'Strict' });
             }
@@ -382,14 +307,13 @@ app.post('/results/:pollId', function (req, res) {
                     voted: false,
                     voteIndex: -1,
                     dupVote: true,
-                    answerColors: answerColors,
+                    answerColors: getColors(thePoll.startColor, thePoll.answers.length),
                     round: round,
                     totalVotes: votes.reduce((a, b) => a + b, 0)
                 })
             }
             if (thePoll.ipCheck) {
                 const ip = getClientIp(req);
-                console.log("Retrieved client ip address and adding to poll record. ip address: " + ip);
                 if (!thePoll.ipAddresses.includes(ip)) {
                     thePoll.ipAddresses.push(ip);
                 }
@@ -399,7 +323,6 @@ app.post('/results/:pollId', function (req, res) {
             try {
                 (async function savePoll() {
                     let resultPoll = await thePoll.save();
-                    const answerColors = getColors(thePoll.startColor, thePoll.answers.length);
                     
                     return res.render("pages/results", {
                         pageTitle: "PollCall - Results: " + resultPoll.question,
@@ -411,31 +334,41 @@ app.post('/results/:pollId', function (req, res) {
                         votes: resultPoll.votes,
                         voted: true,
                         voteIndex: voteIndex,
-                        answerColors: answerColors,
+                        answerColors: getColors(thePoll.startColor, thePoll.answers.length),
                         round: round,
                         totalVotes: thePoll.votes.reduce((a, b) => a + b, 0),
                     }); // end render
                 })(); // end iife
             } // end try
             catch (err) {
-                console.log("Error saving poll " + resultPoll.pollID + ": " + err);
-                res.status(500).send(err);
+                console.log("Error saving poll " + paramPollID + ": " + err);
+                return res.render("pages/not-found.ejs", {
+                    pageTitle: "Error saving poll " + paramPollID + ": " + err
+                });
             }
         }
     });
 });
 
-app.get('/results/bar-img/:resultsImg', function (req, res) {
+app.get('/results/bar-img/:resultsImg', function (req, res) { // Generate bar graph route
     const oImg = req.params.resultsImg;
     const rImg = oImg.slice(0, -4);
-    var query = Poll.findOne({ pollID: rImg }); // FIX
+    /*
+    try {
+        const query = Poll.findOne({ pollID: rImg });
+    }
+    catch(err) {
+        console.log("Error in poll lookup during bar-img retrieval in app.js:359 - " + err);
+        return res.status(500).send("Error in poll lookup app.js:362 - " + _err);
+    }
+    */
     query.exec(function (err, result) {
         if (err) {
-            res.send("Error during database lookup of poll with id " + rImg + ":" + err);
+            return res.status(500).send("Error during database lookup of poll with id " + rImg + ":" + err);
         }
         else {
             if (result == null) { // lookup didn't find that pollId
-                res.status(404).send("Poll " + rImg + " not found!");
+                return res.status(404).send("Poll " + rImg + " not found!");
             }
             // else
             const thePoll = new Poll(result);
@@ -483,12 +416,12 @@ app.get('/results/bar-img/:resultsImg', function (req, res) {
                     const imgBlob = await response.blob(); 
                     res.type(imgBlob.type); // set response type
                     imgBlob.arrayBuffer().then(buf => {
-                        res.send(Buffer.from(buf)) // displays in browser                        
+                        return res.send(Buffer.from(buf)) // displays in browser                        
                     })
                 }
                 else {
                     console.log("app.js:227 HTTP Error - QuickChart server responded: " + response.status);
-                    res.send("HTTP Error - QuickChart server responded: " + response.status);
+                    return res.status(500).send("HTTP Error - QuickChart server responded: " + response.status);
                 }
             })();
         } // end else
@@ -498,17 +431,19 @@ app.get('/results/img/:resultsImg', function (req, res) {
     const oImg = req.params.resultsImg;
     const rImg = oImg.slice(0, -4);
     var query = Poll.findOne({ pollID: rImg }); // FIX
+
     query.exec(function (err, result) {
         if (err) {
-            res.send("Error during database lookup of poll with id " + rImg + ":" + err);
+            return res.status(500).send("Error during database lookup of poll with id " + rImg + ":" + err);
         }
         else {
             if (result == null) { // lookup didn't find that pollId
-                res.status(404).send("Poll " + rImg + " not found!");
+                return res.status(404).send("Poll " + rImg + " not found!");
             }
             // else
             const thePoll = new Poll(result);
-            if (!thePoll.startColor) thePoll.startColor = 0;
+            if (!thePoll.startColor)
+                thePoll.startColor = 0;
             let colors = getColors(thePoll.startColor, thePoll.answers.length);
 
             const chartConf = {
@@ -530,8 +465,6 @@ app.get('/results/img/:resultsImg', function (req, res) {
             } // end chartConf
 
             const chartConfigString = encodeURIComponent(JSON.stringify(chartConf));
-            //console.log("478")
-            //console.log(chartConf);
             let url = 'https://quickchart.io/chart?c=' + chartConfigString;
 
             (async function getChart() {
@@ -540,19 +473,19 @@ app.get('/results/img/:resultsImg', function (req, res) {
                     const imgBlob = await response.blob(); 
                     res.type(imgBlob.type); // set response type
                     imgBlob.arrayBuffer().then(buf => {
-                        res.send(Buffer.from(buf)) // displays in browser                        
+                        return res.send(Buffer.from(buf)) // displays in browser                        
                     })
                 }
                 else {
                     console.log("app.js:227 HTTP Error - QuickChart server responded: " + response.status);
-                    res.send("HTTP Error - QuickChart server responded: " + response.status);
+                    return res.status(500).send("HTTP Error - QuickChart server responded: " + response.status);
                 }
             })();
         } // end else
     }); // end query.exec()
 });
 
-async function genPollId() {
+async function genPollId() { // Genrate random string for pollID
     const candidate = nanoid(6);
     const searchResult = await Poll.findOne({ pollID: candidate });
     if (searchResult) {
@@ -561,29 +494,26 @@ async function genPollId() {
     else return candidate;
 }
 
-function getClientIp(req) {
+function getClientIp(req) { // Amazon EC2 / Heroku workaround to get real client IP
   var ipAddress;
-  // Amazon EC2 / Heroku workaround to get real client IP
   var forwardedIpsStr = req.header('x-forwarded-for'); 
   if (forwardedIpsStr) {
-    // 'x-forwarded-for' header may return multiple IP addresses in
-    // the format: "client IP, proxy 1 IP, proxy 2 IP" so take the
-    // the first one
+    // 'x-forwarded-for' header may return multiple IP addresses in format: "client IP, proxy 1 IP, proxy 2 IP" so take the the first one
     var forwardedIps = forwardedIpsStr.split(',');
     ipAddress = forwardedIps[0];
   }
   if (!ipAddress) {
-    // Ensure getting client IP address still works in
-    // development environment
+    // Ensures getting client IP address still works normal way in development environment
     ipAddress = req.connection.remoteAddress;
   }
   return ipAddress;
-};
-
+}
+// TODO: unused
+/*
 function transparentize(value, opacity) {
   var alpha = opacity === undefined ? 0.5 : 1 - opacity;
   return colorLib(value).alpha(alpha).rgbString();
-}
+} */
 
 // Return array of letter characters, starting with "A", one for each answer of numAnswers
 function getCharacters(numAnswers){
