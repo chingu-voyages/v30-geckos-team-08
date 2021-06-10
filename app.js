@@ -247,7 +247,7 @@ app.get("/pollCreated/:pollId", function (req, res) {
     });
 });
 
-app.get('/about.html', function (req, res) {
+app.get('/about', function (req, res) {
     res.render('pages/about',
         {
             aVariable: 'About page',
