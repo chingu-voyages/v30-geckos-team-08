@@ -8,6 +8,9 @@ const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const path = require('path');
 const getColors = require('./color-helper');
+//const CC = require("cookieconsent");
+
+
 
 // Dumped svg-captcha-express in favor of its fork, ppfun-captcha with security bugfix
 const svgCaptcha = require('ppfun-captcha');
@@ -350,31 +353,24 @@ app.post('/results/:pollId', function (req, res) {
     });
 });
 
+// TODO: this can be consolidated with for .../img/:resultsImg
 app.get('/results/bar-img/:resultsImg', function (req, res) { // Generate bar graph route
-    const oImg = req.params.resultsImg;
-    const rImg = oImg.slice(0, -4);
-    /*
-    try {
-        const query = Poll.findOne({ pollID: rImg });
-    }
-    catch(err) {
-        console.log("Error in poll lookup during bar-img retrieval in app.js:359 - " + err);
-        return res.status(500).send("Error in poll lookup app.js:362 - " + _err);
-    }
-    */
+    const pollID = req.params.resultsImg.slice(0, -4);
+
+    const query = Poll.findOne({ pollID: pollID });
+
     query.exec(function (err, result) {
         if (err) {
-            return res.status(500).send("Error during database lookup of poll with id " + rImg + ":" + err);
+            return res.status(500).send("Error during database lookup of poll with id " + pollID + ":" + err);
         }
         else {
             if (result == null) { // lookup didn't find that pollId
-                return res.status(404).send("Poll " + rImg + " not found!");
-            }
-            // else
+                return res.status(404).send("Poll " + pollID + " not found!");
+            } // else
             const thePoll = new Poll(result);
 
-            if (!thePoll.startColor) thePoll.startColor = 0;
-            let colors = getColors(thePoll.startColor, thePoll.answers.length);
+            if (!thePoll.startColor)
+                thePoll.startColor = 0;
 
             const chartConf = {
                 type: "bar",
@@ -383,7 +379,7 @@ app.get('/results/bar-img/:resultsImg', function (req, res) { // Generate bar gr
                     datasets: [{
                         label: 'Answers',                         // Create the 'Users' dataset
                         data: thePoll.votes,           // Add data to the chart
-                        backgroundColor: colors
+                        backgroundColor: getColors(thePoll.startColor, thePoll.answers.length)
                     }]
                 },
                 options: {
@@ -428,32 +424,30 @@ app.get('/results/bar-img/:resultsImg', function (req, res) { // Generate bar gr
     }); // end query.exec()
 })
 app.get('/results/img/:resultsImg', function (req, res) {
-    const oImg = req.params.resultsImg;
-    const rImg = oImg.slice(0, -4);
-    var query = Poll.findOne({ pollID: rImg }); // FIX
+    const pollID = req.params.resultsImg.slice(0, -4);
+    var query = Poll.findOne({ pollID: pollID }); // FIX
 
     query.exec(function (err, result) {
         if (err) {
-            return res.status(500).send("Error during database lookup of poll with id " + rImg + ":" + err);
+            return res.status(500).send("Error during database lookup of poll with id " + pollID + ":" + err);
         }
         else {
             if (result == null) { // lookup didn't find that pollId
-                return res.status(404).send("Poll " + rImg + " not found!");
+                return res.status(404).send("Poll " + pollID + " not found!");
             }
             // else
             const thePoll = new Poll(result);
             if (!thePoll.startColor)
                 thePoll.startColor = 0;
-            let colors = getColors(thePoll.startColor, thePoll.answers.length);
 
             const chartConf = {
-                type: 'pie',                                // Show a bar chart
+                type: 'pie',
                 data: {
                     labels: getCharacters(thePoll.answers.length),   // Set X-axis labels
                     datasets: [{
-                        label: 'Answers',                         // Create the 'Users' dataset
-                        data: thePoll.votes,           // Add data to the chart
-                        backgroundColor: colors,
+                        label: 'Answers',
+                        data: thePoll.votes,
+                        backgroundColor: getColors(thePoll.startColor, thePoll.answers.length)
                     }]
                 },
                 options: {
@@ -464,8 +458,9 @@ app.get('/results/img/:resultsImg', function (req, res) {
                 }
             } // end chartConf
 
-            const chartConfigString = encodeURIComponent(JSON.stringify(chartConf));
-            let url = 'https://quickchart.io/chart?c=' + chartConfigString;
+            
+            let url = 'https://quickchart.io/chart?c=' +
+                encodeURIComponent(JSON.stringify(chartConf));
 
             (async function getChart() {
                 let response = await fetch(url);
@@ -477,7 +472,7 @@ app.get('/results/img/:resultsImg', function (req, res) {
                     })
                 }
                 else {
-                    console.log("app.js:227 HTTP Error - QuickChart server responded: " + response.status);
+                    console.log("app.js:227 QuickChart server responded: " + response.status);
                     return res.status(500).send("HTTP Error - QuickChart server responded: " + response.status);
                 }
             })();
@@ -488,23 +483,25 @@ app.get('/results/img/:resultsImg', function (req, res) {
 async function genPollId() { // Genrate random string for pollID
     const candidate = nanoid(6);
     const searchResult = await Poll.findOne({ pollID: candidate });
+
+    return (searchResult ? genPollId() : candidate);
+    
+    /*
     if (searchResult) {
         return genPollId();
     }
-    else return candidate;
+    else return candidate; */
 }
 
 function getClientIp(req) { // Amazon EC2 / Heroku workaround to get real client IP
   var ipAddress;
   var forwardedIpsStr = req.header('x-forwarded-for'); 
-  if (forwardedIpsStr) {
-    // 'x-forwarded-for' header may return multiple IP addresses in format: "client IP, proxy 1 IP, proxy 2 IP" so take the the first one
-    var forwardedIps = forwardedIpsStr.split(',');
+  if (forwardedIpsStr) { // 'x-forwarded-for' header may return multiple IP addresses in format: 
+    var forwardedIps = forwardedIpsStr.split(','); //  "client IP, proxy 1 IP, proxy 2 IP..." Take the the first one.
     ipAddress = forwardedIps[0];
   }
   if (!ipAddress) {
-    // Ensures getting client IP address still works normal way in development environment
-    ipAddress = req.connection.remoteAddress;
+    ipAddress = req.connection.remoteAddress; // normal method of getting client IP address
   }
   return ipAddress;
 }
@@ -515,7 +512,7 @@ function transparentize(value, opacity) {
   return colorLib(value).alpha(alpha).rgbString();
 } */
 
-// Return array of letter characters, starting with "A", one for each answer of numAnswers
+// Return array of letter characters, ['A', 'B', 'C', ...], one for each answer of numAnswers
 function getCharacters(numAnswers){
     let rv = [];
     for (let i = 0; i < numAnswers; i++){
@@ -529,5 +526,3 @@ function getCharacters(numAnswers){
 }
 
 const round = (number, decimalPlaces) => Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
-
-const getTotalVotes = (votes) => votes.reduce((a, b) => a + b, 0);

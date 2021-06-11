@@ -7,7 +7,12 @@
 >
 <head>
     <%- include('../partials/head'); %>
+    
     <link rel="stylesheet" type="text/css" href="./css/poll-create-form.css">
+    <!-- I had trouble with line 2 belows so trying cdn -->
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" /> -->
+    
+
     <!-- Use this for subpages  <meta property="og:type" content="article" /> -->
     <!-- But use the below one for home page -->
     <meta property="og:type" content="website" /> 
@@ -54,15 +59,11 @@
 
 <footer>
     <%- include('../partials/footer'); %>
-    
-    <!-- specifically in index.ejs I used this -->
+    <%- include('../partials/cookieconsent-footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
-    <!-- And here's this pages client JS -->
     <script src="./js/poll-create-form.js"></script>
     
-    <script>
-        console.log("index.ejs accessed");
-    </script>
+
 </footer>
 
 </body>
